@@ -1,0 +1,225 @@
+/* Admin Panel Styling — Romantic & Professional */
+
+.admin-root {
+  --admin-cream: oklch(0.988 0.008 85);
+  --admin-card: #ffffff;
+  --admin-card-soft: oklch(0.995 0.005 85);
+  --admin-border: oklch(0.92 0.025 30);
+  --admin-border-hover: oklch(0.85 0.05 30);
+  --admin-blush: oklch(0.92 0.04 25);
+  --admin-blush-deep: oklch(0.86 0.06 25);
+  --admin-rose: oklch(0.68 0.12 20);
+  --admin-rose-dark: oklch(0.55 0.14 20);
+  --admin-gold: oklch(0.78 0.12 80);
+  --admin-gold-soft: oklch(0.96 0.04 80);
+  --admin-cocoa: oklch(0.28 0.04 40);
+  --admin-cocoa-muted: oklch(0.52 0.03 40);
+
+  background-color: var(--admin-cream);
+  color: var(--admin-cocoa);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+.admin-header {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-sidebar {
+  background: #ffffff;
+  border-right: 1px solid var(--admin-border);
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 0.925rem;
+  color: var(--admin-cocoa-muted);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.admin-nav-item:hover {
+  color: var(--admin-rose);
+  background: var(--admin-blush);
+  transform: translateX(2px);
+}
+
+.admin-nav-item.active {
+  color: var(--admin-rose-dark);
+  background: color-mix(in oklab, var(--admin-blush) 65%, white);
+  border-color: color-mix(in oklab, var(--admin-rose) 30%, transparent);
+  font-weight: 600;
+  box-shadow: 0 2px 8px -2px rgba(180, 80, 100, 0.12);
+}
+
+.admin-card {
+  background: #ffffff;
+  border: 1px solid var(--admin-border);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px -8px rgba(100, 50, 60, 0.06);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.admin-card:hover {
+  border-color: var(--admin-border-hover);
+  box-shadow: 0 8px 25px -8px rgba(100, 50, 60, 0.1);
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.admin-badge-gold {
+  background: var(--admin-gold-soft);
+  color: oklch(0.5 0.12 70);
+  border: 1px solid color-mix(in oklab, var(--admin-gold) 40%, transparent);
+}
+
+.admin-badge-published {
+  background: oklch(0.94 0.05 145);
+  color: oklch(0.42 0.12 145);
+  border: 1px solid oklch(0.85 0.08 145);
+}
+
+.admin-badge-draft {
+  background: oklch(0.95 0.05 60);
+  color: oklch(0.48 0.14 55);
+  border: 1px solid oklch(0.85 0.08 60);
+}
+
+.btn-admin-primary {
+  background: linear-gradient(135deg, var(--admin-rose), oklch(0.62 0.14 22));
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.625rem;
+  padding: 0.5rem 1.125rem;
+  box-shadow: 0 4px 12px -2px rgba(180, 60, 80, 0.3);
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-admin-primary:hover {
+  background: linear-gradient(135deg, var(--admin-rose-dark), oklch(0.58 0.15 22));
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -2px rgba(180, 60, 80, 0.4);
+}
+
+.btn-admin-gold {
+  background: linear-gradient(135deg, oklch(0.8 0.13 80), oklch(0.72 0.14 75));
+  color: oklch(0.25 0.06 60);
+  font-weight: 600;
+  border-radius: 0.625rem;
+  padding: 0.5rem 1.125rem;
+  box-shadow: 0 4px 12px -2px rgba(200, 150, 40, 0.25);
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-admin-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -2px rgba(200, 150, 40, 0.35);
+}
+
+.btn-admin-outline {
+  background: #ffffff;
+  color: var(--admin-cocoa);
+  border: 1px solid var(--admin-border);
+  font-weight: 500;
+  border-radius: 0.625rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.btn-admin-outline:hover {
+  background: var(--admin-blush);
+  border-color: var(--admin-border-hover);
+  color: var(--admin-rose-dark);
+}
+
+/* Clue Preview Box mirroring Page 2 exact style */
+.preview-clue-card {
+  background: #fffdfa;
+  border: 2px solid oklch(0.9 0.04 30);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px -10px rgba(100, 50, 50, 0.12);
+  text-align: center;
+  position: relative;
+}
+
+.preview-clue-title {
+  font-family: var(--font-hand);
+  font-size: 1.75rem;
+  color: var(--admin-cocoa);
+  margin-bottom: 0.75rem;
+}
+
+.preview-clue-body {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: oklch(0.35 0.04 40);
+  background: rgba(255, 248, 240, 0.8);
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border-left: 3px solid var(--admin-rose);
+  margin-bottom: 0.75rem;
+}
+
+/* Tablet Preview Frame */
+.preview-tablet-frame {
+  background: #1e1b24;
+  border-radius: 2rem;
+  padding: 1rem;
+  box-shadow:
+    0 20px 40px -15px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 2px #3e3848;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-tablet-screen {
+  background: #000000;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Upload Dropzone */
+.video-dropzone {
+  border: 2px dashed var(--admin-border-hover);
+  border-radius: 1rem;
+  background: oklch(0.995 0.01 80);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.video-dropzone:hover,
+.video-dropzone.active {
+  border-color: var(--admin-rose);
+  background: var(--admin-blush);
+}

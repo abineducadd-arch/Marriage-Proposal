@@ -1,0 +1,930 @@
+@reference "../styles.css";
+
+.page-three {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: 100svh;
+  overflow: hidden;
+  place-items: start center;
+  padding: clamp(20px, 4vh, 52px) 22px 220px;
+  color: var(--cream);
+  background: var(--mission-night);
+}
+.mission-room-art,
+.mission-room-shade {
+  position: fixed;
+  z-index: -2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.mission-room-art {
+  object-fit: cover;
+  object-position: center;
+}
+.mission-room-shade {
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--mission-night) 35%, transparent),
+    transparent 38%,
+    color-mix(in oklab, var(--mission-night) 58%, transparent)
+  );
+}
+.mission-screen {
+  position: relative;
+  display: flex;
+  width: min(980px, 100%);
+  min-height: min(660px, calc(100svh - 270px));
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--mission-gold) 66%, var(--mission-lavender));
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--mission-night) 93%, transparent);
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--mission-gold) 11%, transparent),
+    0 18px 90px color-mix(in oklab, var(--mission-night) 75%, transparent),
+    inset 0 0 50px color-mix(in oklab, var(--mission-blue) 12%, transparent);
+  animation: screen-wake 1s both;
+}
+.mission-screen::before {
+  position: absolute;
+  inset: 0;
+  border: 1px solid color-mix(in oklab, var(--mission-lavender) 14%, transparent);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+}
+.mission-screen-heading {
+  display: flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid color-mix(in oklab, var(--mission-lavender) 22%, transparent);
+  padding: 12px 22px;
+  color: var(--mission-lavender);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+.mission-screen-heading p {
+  margin: 0;
+}
+.mission-screen-heading > span {
+  color: color-mix(in oklab, var(--mission-lavender) 80%, var(--cream));
+  font-size: 10px;
+  letter-spacing: 0;
+}
+.signal-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.signal-status i,
+.mission-loading i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mission-gold);
+  box-shadow: 0 0 12px var(--mission-gold);
+  animation: signal-blink 1.6s ease-in-out infinite;
+}
+.screen-content {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 4vw, 46px);
+  text-align: center;
+}
+.mission-emblem,
+.ai-sigil {
+  display: grid;
+  width: 106px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--mission-gold) 74%, transparent);
+  border-radius: 50%;
+  color: var(--mission-gold);
+  box-shadow:
+    0 0 34px color-mix(in oklab, var(--mission-lavender) 24%, transparent),
+    inset 0 0 30px color-mix(in oklab, var(--mission-blue) 16%, transparent);
+}
+.mission-emblem span {
+  font-family: var(--font-display);
+  font-size: 51px;
+}
+.mission-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mission-lavender);
+  font-size: 14px;
+}
+.mission-button {
+  min-height: 48px;
+  max-width: min(100%, 360px);
+  margin-top: 18px;
+  border: 1px solid color-mix(in oklab, var(--mission-gold) 66%, var(--rose));
+  border-radius: 4px;
+  padding: 12px 25px;
+  white-space: normal;
+  background: var(--blush);
+  color: var(--cocoa);
+  box-shadow: 0 0 22px color-mix(in oklab, var(--mission-gold) 17%, transparent);
+  font-size: 15px;
+  font-weight: 800;
+}
+.mission-button:hover {
+  background: var(--petal);
+}
+.mission-button:focus-visible,
+.yes-button:focus-visible,
+.no-button:focus-visible,
+.skip-intro:focus-visible {
+  outline: 3px solid var(--mission-gold);
+  outline-offset: 4px;
+}
+.skip-intro {
+  min-height: 42px;
+  margin-top: 6px;
+  color: var(--mission-lavender);
+}
+.briefing-content {
+  gap: 12px;
+}
+.ai-sigil {
+  position: relative;
+  width: 82px;
+  color: var(--mission-lavender);
+  border-color: color-mix(in oklab, var(--mission-lavender) 58%, transparent);
+  animation: sigil-glow 3s ease-in-out infinite;
+}
+.ai-sigil span {
+  font-size: 32px;
+}
+.ai-sigil i {
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  width: 12px;
+  height: 1px;
+  background: var(--mission-blue);
+  box-shadow: 0 0 8px var(--mission-blue);
+}
+.ai-sigil i:nth-of-type(2) {
+  left: auto;
+  right: -10px;
+}
+.ai-sigil i:nth-of-type(3) {
+  top: 13px;
+  left: 50%;
+  width: 1px;
+  height: 12px;
+}
+.ai-caption,
+.sender-label {
+  margin: 8px 0 0;
+  color: var(--mission-gold);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+.ai-message {
+  max-width: 660px;
+  min-height: 74px;
+  margin: 8px 0;
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.35;
+  animation: transmission-in 0.48s ease-out both;
+}
+.transmission-progress {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0;
+}
+.transmission-progress span {
+  width: 22px;
+  height: 3px;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--mission-lavender) 24%, transparent);
+}
+.transmission-progress .progress-active {
+  background: var(--mission-gold);
+  box-shadow: 0 0 10px var(--mission-gold);
+}
+.incoming-content {
+  gap: 11px;
+}
+.message-alert {
+  position: relative;
+  display: grid;
+  width: 86px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid var(--mission-gold);
+  border-radius: 50%;
+  color: var(--mission-gold);
+  font-size: 38px;
+  animation: alert-ring 2s ease-out infinite;
+}
+.message-alert i {
+  position: absolute;
+  top: 5px;
+  right: 4px;
+  width: 13px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--rose);
+  box-shadow: 0 0 12px var(--rose);
+}
+.incoming-label {
+  color: var(--mission-gold);
+  font-size: clamp(15px, 2.4vw, 21px);
+  font-weight: 900;
+  letter-spacing: 1.6px;
+}
+.incoming-copy,
+.mochi-reaction {
+  max-width: 560px;
+  color: var(--cream);
+  line-height: 1.6;
+}
+.mochi-reaction {
+  color: var(--mission-lavender);
+  font-family: var(--font-hand);
+  font-size: 24px;
+}
+.proposal-content {
+  justify-content: flex-start;
+  gap: 12px;
+  padding-top: clamp(17px, 3vh, 30px);
+  padding-bottom: 20px;
+}
+.sender-label {
+  flex: 0 0 auto;
+}
+.proposal-letter {
+  width: min(720px, 100%);
+  max-height: min(52svh, 485px);
+  flex: 0 1 auto;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid color-mix(in oklab, var(--mission-gold) 80%, var(--blush));
+  border-radius: 5px;
+  padding: clamp(18px, 3vw, 31px);
+  background-color: var(--cream);
+  background-image: radial-gradient(
+    ellipse at 80% 20%,
+    color-mix(in oklab, var(--blush) 22%, transparent),
+    transparent 68%
+  );
+  color: var(--cocoa);
+  text-align: left;
+  box-shadow:
+    0 8px 30px color-mix(in oklab, var(--mission-night) 30%, transparent),
+    inset 0 0 25px color-mix(in oklab, var(--mission-gold) 9%, transparent);
+}
+.proposal-letter h1 {
+  margin: 0 0 15px;
+  color: var(--cocoa);
+  font-family: var(--font-hand);
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.2;
+}
+.proposal-letter p {
+  margin: 0 0 10px;
+  font-size: clamp(13px, 1.5vw, 15px);
+  line-height: 1.52;
+}
+.proposal-letter h2 {
+  margin: 15px 0;
+  color: var(--rose);
+  font-family: var(--font-display);
+  font-size: clamp(25px, 3.2vw, 36px);
+  line-height: 1.15;
+  text-align: center;
+}
+.proposal-actions {
+  display: flex;
+  min-height: 52px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+.yes-button {
+  min-width: 152px;
+  min-height: 50px;
+  border: 1px solid var(--mission-gold);
+  border-radius: 4px;
+  background: var(--blush);
+  color: var(--cocoa);
+  box-shadow: 0 0 25px color-mix(in oklab, var(--rose) 25%, transparent);
+  font-size: 16px;
+  font-weight: 900;
+}
+.yes-button:hover {
+  background: var(--petal);
+}
+.no-button-wrap {
+  position: relative;
+  display: inline-flex;
+  min-width: 100px;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+}
+.no-button {
+  position: relative;
+  min-width: 94px;
+  min-height: 44px;
+  border-color: color-mix(in oklab, var(--mission-lavender) 60%, transparent);
+  background: color-mix(in oklab, var(--mission-plum) 85%, transparent);
+  color: var(--cream);
+  transition:
+    transform 0.25s ease,
+    opacity 0.3s ease;
+}
+.no-stage-1 .no-button {
+  transform: scale(0.96);
+  animation: tiny-crack 0.4s ease-out;
+}
+.no-stage-2 .no-button {
+  transform: scale(0.82);
+  animation: shell-crack 0.48s ease-out;
+}
+.no-stage-3 .no-button {
+  animation: shell-shatter 0.65s ease-in forwards;
+}
+.shell-fragments {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.shell-fragments i {
+  position: absolute;
+  top: 12%;
+  left: 23%;
+  width: 10px;
+  height: 13px;
+  border: 1px solid var(--mission-gold);
+  border-radius: 2px 8px 3px 8px;
+  background: var(--blush);
+  animation: fragment-fly 0.55s ease-out both;
+}
+.shell-fragments i:nth-child(2) {
+  top: 60%;
+  left: 66%;
+  animation-delay: 0.04s;
+}
+.shell-fragments i:nth-child(3) {
+  top: 8%;
+  left: 71%;
+  animation-delay: 0.09s;
+}
+.shell-fragments i:nth-child(4) {
+  top: 66%;
+  left: 21%;
+  animation-delay: 0.14s;
+}
+.proposal-accepted .proposal-letter {
+  animation: letter-glow 0.85s ease-in-out both;
+}
+.no-reaction {
+  width: min(650px, 100%);
+  margin: 0;
+  color: var(--mission-lavender);
+  font-family: var(--font-hand);
+  font-size: 20px;
+  line-height: 1.3;
+}
+.celebration-content {
+  gap: 14px;
+}
+.celebration-content h1 {
+  max-width: 720px;
+  margin: 0;
+  color: var(--mission-gold);
+  font-family: var(--font-display);
+  font-size: clamp(35px, 6vw, 64px);
+  line-height: 1.06;
+  text-shadow: 0 0 25px color-mix(in oklab, var(--mission-gold) 30%, transparent);
+}
+.celebration-message {
+  max-width: 670px;
+  min-height: 54px;
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: clamp(20px, 3vw, 30px);
+  line-height: 1.42;
+}
+.celebration-sparkles {
+  position: absolute;
+  inset: 8% 12%;
+  pointer-events: none;
+}
+.celebration-sparkles i {
+  position: absolute;
+  color: var(--mission-gold);
+  font-size: 27px;
+  font-style: normal;
+  animation: sparkle-drift 3.3s ease-in-out infinite;
+}
+.celebration-sparkles i:nth-child(1) {
+  top: 8%;
+  left: 11%;
+}
+.celebration-sparkles i:nth-child(2) {
+  top: 18%;
+  right: 9%;
+  animation-delay: 0.5s;
+}
+.celebration-sparkles i:nth-child(3) {
+  bottom: 16%;
+  left: 6%;
+  animation-delay: 0.9s;
+}
+.celebration-sparkles i:nth-child(4) {
+  bottom: 10%;
+  right: 14%;
+  animation-delay: 1.3s;
+}
+.celebration-sparkles i:nth-child(5) {
+  top: 47%;
+  left: 2%;
+  animation-delay: 1.6s;
+}
+.arrival-message {
+  color: var(--mission-gold);
+  font-family: var(--font-hand);
+  font-size: clamp(24px, 4vw, 34px);
+}
+.celebration-wash {
+  position: fixed;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in oklab, var(--mission-gold) 18%, transparent);
+  animation: warm-celebration 1.5s ease-out forwards;
+}
+.tablet-content {
+  gap: 11px;
+}
+.tablet-scene {
+  display: flex;
+  width: min(760px, 100%);
+  min-height: clamp(180px, 32vh, 300px);
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.tablet-device {
+  position: relative;
+  width: min(570px, 78vw);
+  aspect-ratio: 16 / 9;
+  border: 8px solid color-mix(in oklab, var(--mission-night) 80%, var(--mission-gold));
+  border-radius: 17px;
+  padding: 8px;
+  background: var(--mission-night);
+  box-shadow:
+    0 0 0 1px var(--mission-gold),
+    0 14px 32px color-mix(in oklab, var(--mission-night) 65%, transparent),
+    0 0 35px color-mix(in oklab, var(--rose) 24%, transparent);
+  animation: tablet-arrive 0.7s ease-out both;
+}
+.tablet-screen {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--mission-plum);
+}
+.tablet-screen video {
+  width: 100%;
+  height: 100%;
+  background: var(--mission-night);
+  object-fit: contain;
+}
+.tablet-camera {
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--mission-gold);
+}
+.video-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in oklab, var(--mission-lavender) 20%, var(--mission-plum)),
+    var(--mission-night)
+  );
+  color: var(--cream);
+}
+.video-placeholder p {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: clamp(20px, 3vw, 28px);
+}
+.video-placeholder > span:last-child {
+  color: var(--mission-lavender);
+  font-size: 12px;
+}
+.video-play-icon {
+  display: grid;
+  width: 46px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid var(--mission-gold);
+  border-radius: 50%;
+  color: var(--mission-gold);
+  font-size: 18px;
+  text-indent: 3px;
+}
+.tablet-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--mission-gold);
+}
+.tablet-preview > span {
+  font-size: 28px;
+}
+.tablet-preview p {
+  margin: 0;
+  color: var(--cream);
+  font-family: var(--font-hand);
+  font-size: 22px;
+}
+.tablet-mochi {
+  width: 118px;
+  flex: 0 0 118px;
+  animation: mochi-present 0.8s ease-out both;
+}
+.tablet-mochi > div > div {
+  width: 118px;
+}
+.tablet-dialogue {
+  max-width: 620px;
+  margin: 0;
+  color: var(--mission-lavender);
+  font-family: var(--font-hand);
+  font-size: 24px;
+  line-height: 1.28;
+}
+.video-dedication {
+  margin: 0;
+  color: var(--mission-gold);
+  font-family: var(--font-hand);
+  font-size: 26px;
+}
+.mission-guide {
+  position: fixed;
+  z-index: 4;
+  bottom: 14px;
+  left: 50%;
+  width: min(630px, calc(100% - 28px));
+  transform: translateX(-50%);
+}
+.mission-guide .mochi-guide {
+  position: relative;
+  inset: auto;
+  width: 100%;
+}
+.mission-guide .guide-bunny {
+  width: 112px;
+}
+.mission-guide .guide-bunny > div > div {
+  width: 112px;
+}
+.mission-guide .guide-words .bubble {
+  min-height: 74px;
+  padding: 12px 20px;
+}
+.mission-guide .guide-words .bubble p {
+  font-size: 14px;
+  line-height: 1.4;
+}
+.mission-guide .guide-words .bubble > span:first-child {
+  display: none;
+}
+.mission-guide-incoming .mission-guide,
+.mission-guide-proposal .mission-guide,
+.mission-guide-celebration .mission-guide,
+.mission-guide-tablet .mission-guide {
+  bottom: 10px;
+}
+@keyframes signal-blink {
+  50% {
+    opacity: 0.42;
+  }
+}
+@keyframes screen-wake {
+  from {
+    opacity: 0.2;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes sigil-glow {
+  50% {
+    box-shadow:
+      0 0 44px color-mix(in oklab, var(--mission-lavender) 34%, transparent),
+      inset 0 0 32px color-mix(in oklab, var(--mission-blue) 23%, transparent);
+  }
+}
+@keyframes transmission-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes alert-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--mission-gold) 24%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+@keyframes tiny-crack {
+  30% {
+    transform: rotate(-3deg) scale(0.96);
+  }
+  65% {
+    transform: rotate(2deg) scale(0.93);
+  }
+}
+@keyframes shell-crack {
+  25% {
+    transform: rotate(-5deg) scale(0.89);
+  }
+  50% {
+    transform: rotate(4deg) scale(0.82);
+  }
+  75% {
+    transform: rotate(-2deg) scale(0.78);
+  }
+}
+@keyframes shell-shatter {
+  30% {
+    transform: rotate(-7deg) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(14deg);
+  }
+}
+@keyframes fragment-fly {
+  to {
+    opacity: 0;
+    transform: translateY(-17px) rotate(54deg);
+  }
+}
+@keyframes sparkle-drift {
+  50% {
+    opacity: 0.52;
+    transform: translateY(-9px) scale(1.14);
+  }
+}
+@keyframes warm-celebration {
+  0% {
+    opacity: 0.32;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes letter-glow {
+  0%,
+  100% {
+    filter: none;
+    box-shadow:
+      0 8px 30px color-mix(in oklab, var(--mission-night) 30%, transparent),
+      inset 0 0 25px color-mix(in oklab, var(--mission-gold) 9%, transparent);
+  }
+  50% {
+    filter: brightness(1.08);
+    box-shadow: 0 0 50px color-mix(in oklab, var(--mission-gold) 55%, transparent);
+  }
+}
+@keyframes tablet-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mochi-present {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 640px) {
+  .page-three {
+    min-height: 100svh;
+    padding: 16px 12px 198px;
+  }
+  .mission-screen {
+    min-height: min(690px, calc(100svh - 225px));
+    border-radius: 10px;
+  }
+  .mission-screen-heading {
+    min-height: 48px;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 12px;
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+  .mission-screen-heading > span {
+    font-size: 9px;
+  }
+  .screen-content {
+    padding: 18px 15px;
+  }
+  .mission-emblem {
+    width: 78px;
+  }
+  .mission-emblem span {
+    font-size: 40px;
+  }
+  .mission-loading {
+    font-size: 12px;
+  }
+  .mission-button {
+    min-height: 46px;
+    font-size: 14px;
+  }
+  .ai-sigil {
+    width: 66px;
+  }
+  .ai-message {
+    min-height: 105px;
+    font-size: 23px;
+  }
+  .transmission-progress {
+    gap: 5px;
+  }
+  .transmission-progress span {
+    width: 16px;
+  }
+  .incoming-copy {
+    font-size: 14px;
+  }
+  .mochi-reaction {
+    font-size: 21px;
+  }
+  .proposal-content {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 13px 10px;
+  }
+  .proposal-letter {
+    max-height: min(51svh, 370px);
+    padding: 15px;
+  }
+  .proposal-letter h1 {
+    font-size: 24px;
+  }
+  .proposal-letter p {
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.43;
+  }
+  .proposal-letter h2 {
+    margin: 12px 0;
+    font-size: 27px;
+  }
+  .proposal-actions {
+    min-height: 48px;
+    gap: 10px;
+  }
+  .yes-button {
+    min-width: 132px;
+    min-height: 48px;
+  }
+  .no-button-wrap {
+    min-width: 84px;
+  }
+  .no-button {
+    min-width: 82px;
+    min-height: 44px;
+  }
+  .no-reaction {
+    font-size: 18px;
+  }
+  .celebration-content h1 {
+    font-size: 40px;
+  }
+  .celebration-message {
+    font-size: 22px;
+  }
+  .tablet-scene {
+    min-height: 170px;
+    gap: 0;
+  }
+  .tablet-device {
+    width: min(100%, 460px);
+    border-width: 6px;
+    padding: 5px;
+  }
+  .tablet-mochi {
+    display: none;
+  }
+  .tablet-dialogue {
+    font-size: 21px;
+  }
+  .mission-guide {
+    bottom: 12px;
+    width: calc(100% - 24px);
+  }
+  .mission-guide .guide-bunny,
+  .mission-guide .guide-bunny > div > div {
+    width: 72px;
+  }
+  .mission-guide .guide-words .bubble {
+    min-height: 78px;
+    padding: 10px 13px;
+  }
+  .mission-guide .guide-words .bubble p {
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-three *,
+  .page-three *::before,
+  .page-three *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (max-height: 680px) and (min-width: 641px) {
+  .page-three {
+    padding-bottom: 146px;
+  }
+  .mission-screen {
+    min-height: calc(100svh - 180px);
+  }
+  .mission-guide {
+    bottom: 5px;
+    width: min(480px, calc(100% - 24px));
+  }
+  .mission-guide .guide-bunny,
+  .mission-guide .guide-bunny > div > div {
+    width: 78px;
+  }
+  .mission-guide .guide-words .bubble {
+    min-height: 52px;
+    padding: 7px 13px;
+  }
+  .mission-guide .guide-words .bubble p {
+    font-size: 12px;
+  }
+  .proposal-letter {
+    max-height: 43svh;
+  }
+}
