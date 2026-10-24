@@ -1,29 +1,52 @@
-# Welcome to your Lovable project
+# A Little Story Just for You
 
-This project was built with [Lovable](https://lovable.dev).
+An interactive, romantic storybook and marriage proposal web application built with React, TanStack Start, TypeScript, and Tailwind CSS.
 
-## Build with Lovable
+## Features
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+- **Story Journey**: Narrative chapters featuring cute companion artwork and interactive scenes.
+- **Interactive Discovery (Chapter 2)**: Dynamic flashlight exploration mechanic to reveal hidden clues and unlock the secret door.
+- **Proposal Experience (Chapter 3)**: Beautiful cinematic proposal presentation with custom video playback and interactive Yes/No responses.
+- **Admin Management Panel**: Full administration dashboard (`/admin`) to configure recipient details, chapter texts, clues, media, and preview live proposal settings.
+- **Audio & Sound**: Integrated background music, sound effects, and volume controls.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+## Tech Stack
 
-## Development
+- **Framework**: [TanStack Start](https://tanstack.com/start) with SSR
+- **UI & Components**: React 19, Radix UI primitives, Lucide React
+- **Styling**: Tailwind CSS v4, custom keyframe animations
+- **Testing**: Vitest, React Testing Library
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Getting Started
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+### Prerequisites
+
+Node.js (v18 or higher) and npm.
+
+### Installation
+
+```bash
+npm install
+```
+
+### Development
+
+To start the local development server:
+
+```bash
 npm run dev
 ```
 
-## Built with
+Visit [http://localhost:8080](http://localhost:8080) to view the application.
 
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+### Running Tests
+
+```bash
+npm test
+```
+
+### Building for Production
+
+```bash
+npm run build
+```
