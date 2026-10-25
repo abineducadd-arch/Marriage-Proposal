@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { playPeelSound } from "@/lib/sounds";
+import { useEffect, useRef, useState } from "react";
+import { playPeelSound, stopPeelSound } from "@/lib/sounds";
 
 type Props = { active: boolean; onPeelComplete: () => void };
 
@@ -9,6 +9,12 @@ export function FoldedCorner({ active, onPeelComplete }: Props) {
   const [peeling, setPeeling] = useState(false);
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const BASE = 72;
+
+  useEffect(() => {
+    return () => {
+      stopPeelSound();
+    };
+  }, []);
 
   const peel = () => {
     if (!active || peeling) return;
@@ -51,6 +57,7 @@ export function FoldedCorner({ active, onPeelComplete }: Props) {
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
+        onClick={peel}
         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), peel())}
         className={`fixed right-0 top-0 z-40 touch-none select-none focus-visible:outline-2 focus-visible:outline-rose ${active && !peeling ? "animate-nudge cursor-grab origin-top-right" : ""} ${peeling ? "transition-all duration-[1100ms] ease-in-out" : "transition-all duration-200"}`}
         style={{ width: size, height: size }}

@@ -13,12 +13,12 @@ interface SparkleParticle {
 
 const SYMBOLS = ["✦", "✧", "★", "•", "♡"];
 const COLORS = [
-  "#fbbf24", // Soft gold
-  "#fef08a", // Light gold
-  "#f472b6", // Rose pink
-  "#fda4af", // Petal
-  "#67e8f9", // Cyan sparkle
-  "#ffffff", // White sparkle
+  "#c89b3c", // Warm antique gold
+  "#dfba6b", // Soft champagne gold
+  "#8b5a2b", // Vintage sepia
+  "#d4a373", // Warm parchment amber
+  "#e9d5be", // Antique ivory
+  "#b07d4f", // Burnished bronze
 ];
 
 function generateSparkles(count = 18): SparkleParticle[] {

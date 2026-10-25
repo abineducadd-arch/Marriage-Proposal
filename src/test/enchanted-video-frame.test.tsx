@@ -76,28 +76,28 @@ describe("EnchantedVideoFrame Component", () => {
     expect(screen.queryByText(/your special video will appear here/i)).not.toBeInTheDocument();
   });
 
-  it("renders decorative ornaments: 4 corners, 2 crests, sweep beam, and particles", () => {
+  it("renders minimal double-gold frame with 4 engraved corners and no excessive clutter", () => {
     const { container } = render(<EnchantedVideoFrame videoSrc={null} />);
 
-    // 4 Corner ornaments
+    // 4 Symmetrical engraved corner ornaments
     expect(container.querySelector(".enchanted-corner-tl")).toBeInTheDocument();
     expect(container.querySelector(".enchanted-corner-tr")).toBeInTheDocument();
     expect(container.querySelector(".enchanted-corner-bl")).toBeInTheDocument();
     expect(container.querySelector(".enchanted-corner-br")).toBeInTheDocument();
 
-    // Top and bottom crests
-    expect(container.querySelector(".enchanted-crest-top")).toBeInTheDocument();
-    expect(container.querySelector(".enchanted-crest-bottom")).toBeInTheDocument();
+    // Double gold frame outer and inner layers
+    expect(container.querySelector(".enchanted-frame-outer")).toBeInTheDocument();
+    expect(container.querySelector(".enchanted-frame-inner")).toBeInTheDocument();
 
-    // Animated light sweep beam
-    expect(container.querySelector(".enchanted-sweep-beam")).toBeInTheDocument();
-
-    // Holographic sheen
+    // Subtle border reflection and glass sheen
+    expect(container.querySelector(".enchanted-border-sheen")).toBeInTheDocument();
     expect(container.querySelector(".enchanted-holographic-sheen")).toBeInTheDocument();
 
-    // Ambient particles
-    const particles = container.querySelectorAll(".enchanted-particle");
-    expect(particles.length).toBeGreaterThanOrEqual(8);
+    // Excessive clutter should be cleanly removed
+    expect(container.querySelector(".enchanted-crest-top")).not.toBeInTheDocument();
+    expect(container.querySelector(".enchanted-crest-bottom")).not.toBeInTheDocument();
+    expect(container.querySelector(".enchanted-sweep-beam")).not.toBeInTheDocument();
+    expect(container.querySelectorAll(".enchanted-particle")).toHaveLength(0);
   });
 });
 

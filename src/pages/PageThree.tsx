@@ -14,7 +14,13 @@ import { PreviewBanner } from "@/components/PreviewBanner";
 import { SoundToggle } from "@/components/SoundToggle";
 import { PartyCelebration } from "@/components/story/PartyCelebration";
 import { EnchantedVideoFrame } from "@/components/story/EnchantedVideoFrame";
-import { playContinue, playCelebration, playHeartbeat, playTransition } from "@/lib/sounds";
+import {
+  playContinue,
+  playCelebration,
+  playHeartbeat,
+  playTransition,
+  playTransmission,
+} from "@/lib/sounds";
 import missionRoom from "@/assets/story/mission-control.jpg";
 import "./PageThree.css";
 
@@ -141,7 +147,7 @@ export function PageThree() {
               <Button
                 className="mission-button"
                 onClick={() => {
-                  playTransition();
+                  playTransmission();
                   setScene("briefing");
                 }}
               >
@@ -179,11 +185,10 @@ export function PageThree() {
             <Button
               className="mission-button"
               onClick={() => {
+                playTransmission();
                 if (briefingLine < AI_MESSAGES.length - 1) {
-                  playContinue();
                   setBriefingLine((line) => line + 1);
                 } else {
-                  playTransition();
                   setScene("incoming");
                 }
               }}
@@ -208,6 +213,7 @@ export function PageThree() {
             <Button
               className="mission-button"
               onClick={() => {
+                playTransmission();
                 playHeartbeat();
                 setScene("proposal");
               }}
@@ -316,7 +322,7 @@ export function PageThree() {
             <Button
               className="mission-button"
               onClick={() => {
-                playContinue();
+                playTransmission();
                 nextCelebration();
               }}
             >
@@ -352,7 +358,7 @@ export function PageThree() {
                 <Button
                   className="mission-button"
                   onClick={() => {
-                    playContinue();
+                    playTransmission();
                     nextTabletLine();
                   }}
                 >
@@ -402,7 +408,13 @@ export function PageThree() {
                       : (TABLET_LINES[tabletLine] ?? "")
             }
             {...(scene === "intro" && introReady && introLine === 0
-              ? { action: "Continue ♡", onAction: () => setIntroLine(1) }
+              ? {
+                  action: "Continue ♡",
+                  onAction: () => {
+                    playContinue();
+                    setIntroLine(1);
+                  },
+                }
               : { onAction: () => setIntroLine(1) })}
           />
         </div>

@@ -9,6 +9,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { type ReactNode } from "react";
+import { BackgroundMusic } from "@/components/BackgroundMusic";
 
 import appCss from "../styles.css?url";
 
@@ -118,6 +119,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* Persistent global background music controller across all routes */}
+      <BackgroundMusic />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

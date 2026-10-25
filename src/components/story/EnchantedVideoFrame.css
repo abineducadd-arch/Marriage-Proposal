@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Enchanted Holographic Video Frame
-   A magical fantasy presentation frame for Page 3's proposal video.
+   Minimal Double Gold Video Frame
+   A refined, elegant double-gold frame for Page 3's proposal video.
    ========================================================================== */
 
 .enchanted-video-presentation {
@@ -13,7 +13,7 @@
   margin: 0 auto;
   position: relative;
   z-index: 3;
-  animation: enchanted-appear 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: enchanted-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* --------------------------------------------------------------------------
@@ -45,23 +45,22 @@
   background: linear-gradient(
     135deg,
     #ffffff 0%,
-    #fff2df 25%,
-    #fde047 50%,
-    #f5d77f 75%,
-    #67e8f9 100%
+    #fff2df 30%,
+    #e5cc91 60%,
+    #c9a45c 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 16px rgba(245, 215, 127, 0.45));
+  filter: drop-shadow(0 0 14px rgba(201, 164, 92, 0.35));
 }
 
 .enchanted-heading-star {
   font-size: 16px;
-  color: #fde047;
+  color: #c9a45c;
   text-shadow:
-    0 0 8px #fde047,
-    0 0 16px #38bdf8;
-  animation: star-glow-pulse 2.8s ease-in-out infinite alternate;
+    0 0 8px rgba(201, 164, 92, 0.6),
+    0 0 16px rgba(138, 106, 61, 0.4);
+  animation: star-glow-pulse 3s ease-in-out infinite alternate;
 }
 
 .enchanted-video-badge {
@@ -70,11 +69,11 @@
   gap: 7px;
   padding: 4px 16px;
   border-radius: 9999px;
-  background: color-mix(in oklab, var(--mission-night, #0f0c1b) 75%, var(--mission-plum, #201733));
-  border: 1px solid rgba(245, 215, 127, 0.45);
+  background: color-mix(in oklab, var(--mission-night, #0f0c1b) 80%, var(--mission-plum, #201733));
+  border: 1px solid rgba(201, 164, 92, 0.45);
   box-shadow:
-    0 0 14px rgba(56, 189, 248, 0.22),
-    inset 0 0 10px rgba(192, 132, 252, 0.18);
+    0 0 14px rgba(201, 164, 92, 0.18),
+    inset 0 0 10px rgba(138, 106, 61, 0.15);
   color: #fff2df;
   font-size: clamp(11px, 2vw, 13px);
   letter-spacing: 0.8px;
@@ -83,12 +82,12 @@
 
 .enchanted-badge-sparkle {
   font-size: 12px;
-  color: #67e8f9;
-  filter: drop-shadow(0 0 4px #67e8f9);
+  color: #e5cc91;
+  filter: drop-shadow(0 0 4px rgba(229, 204, 145, 0.6));
 }
 
 /* --------------------------------------------------------------------------
-   Outer Frame Wrapper & Ornaments
+   Minimal Double Gold Outer Frame Wrapper
    -------------------------------------------------------------------------- */
 .enchanted-frame-wrapper {
   position: relative;
@@ -96,15 +95,16 @@
   margin: 0 auto;
 }
 
-/* SVG Corner Ornaments */
+/* --------------------------------------------------------------------------
+   Small Engraved Corner Details
+   -------------------------------------------------------------------------- */
 .enchanted-corner {
   position: absolute;
   z-index: 10;
   pointer-events: none;
-  width: 58px;
-  height: 58px;
-  filter: drop-shadow(0 0 8px rgba(245, 215, 127, 0.45))
-    drop-shadow(0 0 14px rgba(56, 189, 248, 0.35));
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 4px rgba(201, 164, 92, 0.25));
 }
 
 .enchanted-corner-svg {
@@ -114,203 +114,94 @@
 }
 
 .enchanted-corner-tl {
-  top: -10px;
-  left: -10px;
+  top: -3px;
+  left: -3px;
 }
 
 .enchanted-corner-tr {
-  top: -10px;
-  right: -10px;
+  top: -3px;
+  right: -3px;
   transform: scaleX(-1);
 }
 
 .enchanted-corner-bl {
-  bottom: -10px;
-  left: -10px;
+  bottom: -3px;
+  left: -3px;
   transform: scaleY(-1);
 }
 
 .enchanted-corner-br {
-  bottom: -10px;
-  right: -10px;
+  bottom: -3px;
+  right: -3px;
   transform: scale(-1);
 }
 
-/* Center Crests */
-.enchanted-crest {
-  position: absolute;
-  z-index: 10;
-  pointer-events: none;
-  filter: drop-shadow(0 0 6px rgba(245, 215, 127, 0.4));
-}
-
-.enchanted-crest-top {
-  top: -13px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90px;
-  height: 26px;
-}
-
-.enchanted-crest-bottom {
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 72px;
-  height: 18px;
-}
-
 /* --------------------------------------------------------------------------
-   Twinkling Particles & Sparkles
-   -------------------------------------------------------------------------- */
-.enchanted-particle {
-  position: absolute;
-  pointer-events: none;
-  user-select: none;
-  z-index: 11;
-  line-height: 1;
-}
-
-.particle-star {
-  font-size: 15px;
-  color: #fff9e6;
-  filter: drop-shadow(0 0 6px #fde047) drop-shadow(0 0 10px #38bdf8);
-}
-
-.particle-sparkle {
-  font-size: 13px;
-  color: #67e8f9;
-  filter: drop-shadow(0 0 6px #67e8f9) drop-shadow(0 0 8px #c084fc);
-}
-
-.particle-mote {
-  font-size: 18px;
-  color: #fde047;
-  opacity: 0.6;
-  filter: drop-shadow(0 0 4px #fde047);
-}
-
-/* Individual particle positions and staggered animations */
-.particle-tl-1 {
-  top: -16px;
-  left: -14px;
-  animation: particle-twinkle-a 3.2s ease-in-out infinite;
-}
-
-.particle-tl-2 {
-  top: -6px;
-  left: 38px;
-  animation: particle-twinkle-b 4.1s ease-in-out 0.6s infinite;
-}
-
-.particle-tr-1 {
-  top: -16px;
-  right: -14px;
-  animation: particle-twinkle-b 3.6s ease-in-out 1.2s infinite;
-}
-
-.particle-tr-2 {
-  top: -6px;
-  right: 38px;
-  animation: particle-twinkle-a 4.4s ease-in-out 1.8s infinite;
-}
-
-.particle-bl-1 {
-  bottom: -16px;
-  left: -14px;
-  animation: particle-twinkle-a 3.8s ease-in-out 0.9s infinite;
-}
-
-.particle-bl-2 {
-  bottom: -4px;
-  left: 38px;
-  animation: particle-twinkle-b 4.2s ease-in-out 1.5s infinite;
-}
-
-.particle-br-1 {
-  bottom: -16px;
-  right: -14px;
-  animation: particle-twinkle-b 3.4s ease-in-out 0.3s infinite;
-}
-
-.particle-br-2 {
-  bottom: -4px;
-  right: 38px;
-  animation: particle-twinkle-a 4s ease-in-out 2.1s infinite;
-}
-
-.particle-mote-l {
-  top: 48%;
-  left: -18px;
-  animation: mote-float 4.8s ease-in-out infinite alternate;
-}
-
-.particle-mote-r {
-  top: 52%;
-  right: -18px;
-  animation: mote-float 5.2s ease-in-out 1.2s infinite alternate;
-}
-
-/* --------------------------------------------------------------------------
-   Double-Layer Border & Light Sweep Beam
+   Minimal Double Gold Border Layers
+   - Outer border: muted antique gold (#8A6A3D)
+   - Inner border: muted champagne gold (#C9A45C)
+   - Highlight: warm champagne (#E5CC91)
+   - Subtle glow: rgba(201, 164, 92, 0.22)
    -------------------------------------------------------------------------- */
 .enchanted-frame-outer {
   position: relative;
-  border-radius: 22px;
-  padding: 3px;
-  background: linear-gradient(
-    135deg,
-    rgba(245, 215, 127, 0.85) 0%,
-    rgba(255, 242, 223, 0.95) 25%,
-    rgba(56, 189, 248, 0.85) 50%,
-    rgba(192, 132, 252, 0.8) 75%,
-    rgba(245, 215, 127, 0.9) 100%
-  );
+  border-radius: 18px;
+  border: 1.5px solid #8A6A3D;
+  padding: 5px;
+  background: color-mix(in oklab, var(--mission-night, #0c0916) 94%, #1e162a);
   box-shadow:
-    0 0 25px rgba(245, 215, 127, 0.35),
-    0 0 50px rgba(56, 189, 248, 0.22),
-    0 20px 48px rgba(5, 3, 12, 0.75);
-  animation:
-    enchanted-float 6s ease-in-out infinite,
-    enchanted-glow-pulse 4.5s ease-in-out infinite alternate;
+    0 0 20px rgba(201, 164, 92, 0.22),
+    0 0 42px rgba(138, 106, 61, 0.12),
+    0 16px 40px rgba(5, 3, 10, 0.75);
   overflow: hidden;
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
-/* Rotating Conic Light Sweep Beam */
-.enchanted-sweep-beam {
+.enchanted-frame-outer:hover {
+  box-shadow:
+    0 0 26px rgba(201, 164, 92, 0.28),
+    0 0 50px rgba(138, 106, 61, 0.16),
+    0 18px 44px rgba(5, 3, 10, 0.8);
+}
+
+/* Very slow, faint light reflection along the border */
+.enchanted-border-sheen {
   position: absolute;
-  top: -65%;
-  left: -65%;
-  width: 230%;
-  height: 230%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    transparent 72deg,
-    rgba(255, 255, 255, 0.95) 86deg,
-    rgba(103, 232, 249, 0.95) 98deg,
-    rgba(245, 215, 127, 0.9) 112deg,
-    rgba(192, 132, 252, 0.75) 124deg,
-    transparent 142deg,
-    transparent 360deg
-  );
-  animation: enchanted-sweep-spin 6.5s linear infinite;
+  inset: -150%;
   pointer-events: none;
   z-index: 1;
+  background: linear-gradient(
+    115deg,
+    transparent 44%,
+    rgba(229, 204, 145, 0.06) 48%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(229, 204, 145, 0.06) 52%,
+    transparent 56%
+  );
+  animation: border-sheen-sweep 16s ease-in-out infinite;
+  opacity: 0.6;
 }
 
-/* Inner Frame Bezel (Second Border Layer) */
+@keyframes border-sheen-sweep {
+  0%, 20% {
+    transform: translate(-35%, -35%);
+  }
+  50%, 100% {
+    transform: translate(35%, 35%);
+  }
+}
+
+/* Inner Frame Bezel (Second Gold Border Layer) */
 .enchanted-frame-inner {
   position: relative;
   z-index: 2;
-  border-radius: 19px;
-  padding: 5px;
-  background: linear-gradient(155deg, #181428 0%, #0d0a17 100%);
-  border: 1.5px solid rgba(245, 215, 127, 0.45);
+  border-radius: 12px;
+  border: 1px solid #C9A45C;
+  padding: 3px;
+  background: rgba(10, 7, 18, 0.6);
   box-shadow:
-    inset 0 0 22px rgba(56, 189, 248, 0.28),
-    inset 0 0 40px rgba(192, 132, 252, 0.16),
-    0 0 16px rgba(245, 215, 127, 0.2);
+    inset 0 0 14px rgba(201, 164, 92, 0.08),
+    0 0 8px rgba(201, 164, 92, 0.12);
 }
 
 /* Screen Viewport with 16:9 Aspect Ratio */
@@ -319,13 +210,13 @@
   z-index: 3;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 14px;
+  border-radius: 8px;
   overflow: hidden;
   background: #06040c;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.95);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.95);
 }
 
 /* Video Player */
@@ -335,12 +226,12 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 14px;
+  border-radius: 8px;
   background: #000000;
   display: block;
 }
 
-/* Holographic Glass Reflection Sheen */
+/* Delicate Warm Glass Reflection Sheen */
 .enchanted-holographic-sheen {
   position: absolute;
   inset: 0;
@@ -348,12 +239,12 @@
   z-index: 6;
   background: linear-gradient(
     130deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(103, 232, 249, 0.05) 24%,
-    transparent 42%,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(229, 204, 145, 0.03) 25%,
+    transparent 45%,
     transparent 100%
   );
-  opacity: 0.85;
+  opacity: 0.6;
 }
 
 /* --------------------------------------------------------------------------
@@ -370,7 +261,7 @@
   padding: 24px;
   background: radial-gradient(
     circle at 50% 40%,
-    rgba(40, 26, 68, 0.85) 0%,
+    rgba(32, 23, 48, 0.85) 0%,
     rgba(15, 12, 27, 0.95) 70%,
     #07050f 100%
   );
@@ -396,15 +287,14 @@
 }
 
 .portal-ring-outer {
-  border: 1.5px solid rgba(245, 215, 127, 0.5);
-  box-shadow: 0 0 16px rgba(245, 215, 127, 0.4);
-  animation: portal-pulse 3s ease-in-out infinite;
+  border: 1.5px solid rgba(201, 164, 92, 0.5);
+  box-shadow: 0 0 16px rgba(201, 164, 92, 0.3);
+  animation: portal-pulse 3.5s ease-in-out infinite;
 }
 
 .portal-ring-inner {
   inset: 4px;
-  border: 1px dashed rgba(56, 189, 248, 0.6);
-  animation: enchanted-sweep-spin 12s linear infinite reverse;
+  border: 1px dashed rgba(229, 204, 145, 0.45);
 }
 
 .enchanted-placeholder .video-play-icon {
@@ -413,13 +303,18 @@
   aspect-ratio: 1;
   place-items: center;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(245, 215, 127, 0.25), rgba(56, 189, 248, 0.2));
-  color: #fde047;
+  background: linear-gradient(135deg, rgba(201, 164, 92, 0.25), rgba(138, 106, 61, 0.2));
+  color: #e5cc91;
   font-size: 19px;
   text-indent: 3px;
-  border: 1px solid #fde047;
-  text-shadow: 0 0 10px #fde047;
-  transition: transform 0.25s ease;
+  border: 1px solid #c9a45c;
+  text-shadow: 0 0 8px rgba(229, 204, 145, 0.6);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.enchanted-placeholder:hover .video-play-icon {
+  transform: scale(1.08);
+  background: linear-gradient(135deg, rgba(201, 164, 92, 0.35), rgba(138, 106, 61, 0.3));
 }
 
 .enchanted-placeholder .placeholder-title {
@@ -427,11 +322,11 @@
   font-family: var(--font-hand, "Caveat", cursive);
   font-size: clamp(22px, 3.2vw, 30px);
   color: #fff2df;
-  text-shadow: 0 0 12px rgba(245, 215, 127, 0.4);
+  text-shadow: 0 0 12px rgba(201, 164, 92, 0.35);
 }
 
 .enchanted-placeholder .placeholder-subtitle {
-  color: #c084fc;
+  color: #c9a45c;
   font-size: clamp(12px, 1.8vw, 13.5px);
   letter-spacing: 0.4px;
   opacity: 0.9;
@@ -441,22 +336,22 @@
   display: flex;
   gap: 16px;
   margin-top: 4px;
-  color: #fde047;
+  color: #c9a45c;
   font-size: 13px;
   opacity: 0.75;
 }
 
 .ambient-star-1 {
-  animation: star-glow-pulse 2.4s ease-in-out infinite alternate;
+  animation: star-glow-pulse 2.8s ease-in-out infinite alternate;
 }
 
 .ambient-star-2 {
-  animation: star-glow-pulse 3.1s ease-in-out 0.7s infinite alternate;
-  color: #67e8f9;
+  animation: star-glow-pulse 3.4s ease-in-out 0.7s infinite alternate;
+  color: #e5cc91;
 }
 
 .ambient-star-3 {
-  animation: star-glow-pulse 2.8s ease-in-out 1.4s infinite alternate;
+  animation: star-glow-pulse 3.1s ease-in-out 1.4s infinite alternate;
 }
 
 /* --------------------------------------------------------------------------
@@ -469,10 +364,10 @@
 
 .enchanted-video-footer .video-dedication {
   margin: 0;
-  color: var(--mission-gold, #f5d77f);
+  color: #e5cc91;
   font-family: var(--font-hand, "Caveat", cursive);
   font-size: clamp(22px, 3.2vw, 28px);
-  text-shadow: 0 0 14px color-mix(in oklab, var(--mission-gold, #f5d77f) 40%, transparent);
+  text-shadow: 0 0 14px rgba(201, 164, 92, 0.4);
 }
 
 /* --------------------------------------------------------------------------
@@ -481,7 +376,7 @@
 @keyframes enchanted-appear {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(10px);
+    transform: scale(0.97) translateY(8px);
   }
   to {
     opacity: 1;
@@ -489,48 +384,14 @@
   }
 }
 
-@keyframes enchanted-float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes enchanted-glow-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 20px rgba(245, 215, 127, 0.3),
-      0 0 45px rgba(56, 189, 248, 0.18),
-      0 20px 45px rgba(5, 3, 12, 0.75);
-  }
-  50% {
-    box-shadow:
-      0 0 35px rgba(245, 215, 127, 0.45),
-      0 0 70px rgba(56, 189, 248, 0.28),
-      0 0 95px rgba(192, 132, 252, 0.2),
-      0 24px 52px rgba(5, 3, 12, 0.85);
-  }
-}
-
-@keyframes enchanted-sweep-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes star-glow-pulse {
   0% {
-    opacity: 0.6;
-    transform: scale(0.9);
+    opacity: 0.65;
+    transform: scale(0.95);
   }
   100% {
     opacity: 1;
-    transform: scale(1.15);
+    transform: scale(1.1);
   }
 }
 
@@ -540,41 +401,8 @@
     opacity: 0.65;
   }
   50% {
-    transform: scale(1.08);
-    opacity: 1;
-  }
-}
-
-@keyframes particle-twinkle-a {
-  0%, 100% {
-    opacity: 0.35;
-    transform: scale(0.85) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2) rotate(12deg);
-  }
-}
-
-@keyframes particle-twinkle-b {
-  0%, 100% {
-    opacity: 0.4;
-    transform: scale(0.9) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.15) rotate(-15deg);
-  }
-}
-
-@keyframes mote-float {
-  0% {
-    transform: translateY(0);
-    opacity: 0.4;
-  }
-  100% {
-    transform: translateY(-8px);
-    opacity: 0.85;
+    transform: scale(1.06);
+    opacity: 0.95;
   }
 }
 
@@ -587,58 +415,48 @@
   }
 
   .enchanted-frame-outer {
-    border-radius: 17px;
-    padding: 2.5px;
+    border-radius: 15px;
+    padding: 4px;
+    border-width: 1.25px;
   }
 
   .enchanted-frame-inner {
-    border-radius: 15px;
-    padding: 3.5px;
+    border-radius: 10px;
+    padding: 2px;
+    border-width: 1px;
   }
 
   .enchanted-screen-container {
-    border-radius: 11px;
+    border-radius: 7px;
   }
 
   .enchanted-video-player {
-    border-radius: 11px;
+    border-radius: 7px;
   }
 
   .enchanted-corner {
-    width: 44px;
-    height: 44px;
+    width: 22px;
+    height: 22px;
   }
 
   .enchanted-corner-tl {
-    top: -8px;
-    left: -8px;
+    top: -3px;
+    left: -3px;
   }
 
   .enchanted-corner-tr {
-    top: -8px;
-    right: -8px;
+    top: -3px;
+    right: -3px;
   }
 
   .enchanted-corner-bl {
-    bottom: -8px;
-    left: -8px;
+    bottom: -3px;
+    left: -3px;
   }
 
   .enchanted-corner-br {
-    bottom: -8px;
-    right: -8px;
-  }
-
-  .enchanted-crest-top {
-    width: 72px;
-    height: 20px;
-    top: -10px;
-  }
-
-  .enchanted-crest-bottom {
-    width: 56px;
-    height: 14px;
-    bottom: -7px;
+    bottom: -3px;
+    right: -3px;
   }
 
   .enchanted-video-heading {
@@ -672,10 +490,6 @@
     width: 36px;
     font-size: 15px;
   }
-
-  .particle-mote {
-    display: none;
-  }
 }
 
 /* --------------------------------------------------------------------------
@@ -684,24 +498,16 @@
 @media (prefers-reduced-motion: reduce) {
   .enchanted-video-presentation,
   .enchanted-frame-outer,
-  .enchanted-sweep-beam,
+  .enchanted-border-sheen,
   .enchanted-heading-star,
   .portal-ring-outer,
-  .portal-ring-inner,
-  .particle-star,
-  .particle-sparkle,
-  .particle-mote,
   .ambient-star-1,
   .ambient-star-2,
   .ambient-star-3 {
     animation: none !important;
   }
 
-  .enchanted-sweep-beam {
+  .enchanted-border-sheen {
     display: none !important;
-  }
-
-  .enchanted-particle {
-    opacity: 0.7 !important;
   }
 }

@@ -27,6 +27,7 @@ import {
 } from "@/lib/sounds";
 import hallway from "@/assets/story/door-hallway.jpg";
 import room from "@/assets/story/secret-room.jpg";
+import vintageCoupleImg from "@/assets/story/vintage-couple-vignette.jpg";
 import "./PageTwo.css";
 
 const DARK_LINES = [
@@ -137,7 +138,13 @@ export function PageTwo({
               }
               {...(doorReady
                 ? {}
-                : { action: "What's behind it?", onAction: () => setDoorReady(true) })}
+                : {
+                    action: "What's behind it?",
+                    onAction: () => {
+                      playContinue();
+                      setDoorReady(true);
+                    },
+                  })}
             />
           )}
           {scene === "opening" && <div className="expanding-darkness" aria-hidden="true" />}
@@ -263,19 +270,118 @@ export function PageTwo({
         }}
       >
         {currentObject && activeObject && (
-          <DialogContent className="clue-dialog">
+          <DialogContent className="clue-dialog vintage-parchment-note">
             <MagicalPopupSparkles active={objectOpen} />
-            <DialogTitle className="font-hand">{currentObject.title}</DialogTitle>
-            <div className="opened-object">
-              <ObjectArtwork kind={activeObject} />
+
+            {/* Vintage Aged Parchment Frame Decor */}
+            <div className="parchment-frame-decor" aria-hidden="true">
+              {/* Botanical Corner Flourishes */}
+              <svg
+                className="botanical-corner botanical-tl"
+                viewBox="0 0 100 100"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M14,86 C14,46 36,24 86,14 M20,78 C26,52 48,30 78,20 M32,64 C36,48 50,34 66,28"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  opacity="0.75"
+                />
+                <path
+                  d="M44,24 C48,16 56,16 60,22 C64,28 56,34 48,30 Z M24,44 C18,48 18,56 24,60 C30,64 36,56 32,48 Z"
+                  fill="currentColor"
+                  opacity="0.5"
+                />
+                <circle cx="82" cy="16" r="2.5" fill="currentColor" opacity="0.65" />
+                <circle cx="16" cy="82" r="2.5" fill="currentColor" opacity="0.65" />
+              </svg>
+              <svg
+                className="botanical-corner botanical-tr"
+                viewBox="0 0 100 100"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M86,86 C86,46 64,24 14,14 M80,78 C74,52 52,30 22,20 M68,64 C64,48 50,34 34,28"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  opacity="0.75"
+                />
+                <path
+                  d="M56,24 C52,16 44,16 40,22 C36,28 44,34 52,30 Z M76,44 C82,48 82,56 76,60 C70,64 64,56 68,48 Z"
+                  fill="currentColor"
+                  opacity="0.5"
+                />
+                <circle cx="18" cy="16" r="2.5" fill="currentColor" opacity="0.65" />
+                <circle cx="84" cy="82" r="2.5" fill="currentColor" opacity="0.65" />
+              </svg>
+              <svg
+                className="botanical-corner botanical-br"
+                viewBox="0 0 100 100"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M86,14 C86,54 64,76 14,86 M80,22 C74,48 52,70 22,80 M68,36 C64,52 50,66 34,72"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  opacity="0.75"
+                />
+                <path
+                  d="M56,76 C52,84 44,84 40,78 C36,72 44,66 52,70 Z M76,56 C82,52 82,44 76,40 C70,36 64,44 68,52 Z"
+                  fill="currentColor"
+                  opacity="0.5"
+                />
+                <circle cx="18" cy="84" r="2.5" fill="currentColor" opacity="0.65" />
+                <circle cx="84" cy="18" r="2.5" fill="currentColor" opacity="0.65" />
+              </svg>
+
+              {/* Romantic Vintage Embracing Couple Illustration in bottom-left */}
+              <img
+                src={vintageCoupleImg}
+                alt=""
+                className="vintage-embracing-couple-art"
+                draggable={false}
+              />
             </div>
-            <blockquote className="handwritten-note">{currentObject.clue}</blockquote>
-            <DialogDescription className="clue-dialogue">
-              {currentObject.dialogue}
-            </DialogDescription>
-            <Button className="story-action" onClick={() => setObjectOpen(false)}>
-              Close
-            </Button>
+
+            <div className="parchment-content-layer">
+              <header className="parchment-header">
+                <DialogTitle className="parchment-title font-display">
+                  {currentObject.title}
+                </DialogTitle>
+                <div className="parchment-divider" aria-hidden="true">
+                  <span className="divider-line" />
+                  <span className="divider-motif">❧ ♡ ☙</span>
+                  <span className="divider-line" />
+                </div>
+              </header>
+
+              <div className="opened-object">
+                <ObjectArtwork kind={activeObject} />
+              </div>
+
+              <blockquote className="handwritten-note parchment-message-text">
+                {currentObject.clue}
+              </blockquote>
+
+              <DialogDescription className="clue-dialogue parchment-dialogue">
+                <span className="dialogue-icon" aria-hidden="true">
+                  ✦
+                </span>
+                <span>{currentObject.dialogue}</span>
+              </DialogDescription>
+
+              <div className="parchment-footer">
+                <Button
+                  className="story-action parchment-close-btn"
+                  onClick={() => setObjectOpen(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         )}
       </Dialog>
@@ -289,7 +395,7 @@ export function PageTwo({
           <Button asChild className="story-action">
             <Link
               to={nextPageRoute}
-              onClick={() => playContinue()}
+              onClick={() => playTransition()}
               {...(preview ? { search: () => ({ preview: "true" }) } : {})}
             >
               Continue the adventure ♡

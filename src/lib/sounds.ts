@@ -1,6 +1,35 @@
-import continueSoundUrl from "@/assets/sounds/continue-sound.mp3";
+import continueButtonSoundUrl from "@/assets/sounds/continue button.wav";
+import switchSoundUrl from "@/assets/sounds/switch sound.wav";
+import transmissionSoundUrl from "@/assets/sounds/transmission sound.wav";
 import doorSoundUrl from "@/assets/sounds/door-sound.mp3";
-import peelSoundUrl from "@/assets/sounds/peel-sound.wav";
+import paperPeelingSoundUrl from "@/assets/sounds/paper peeling.mp3";
+import backgroundSoundUrl from "@/assets/sounds/background sound.mp3";
+
+export const SOUND_URLS = {
+  continue: continueButtonSoundUrl,
+  switch: switchSoundUrl,
+  transmission: transmissionSoundUrl,
+  door: doorSoundUrl,
+  peel: paperPeelingSoundUrl,
+  paperPeeling: paperPeelingSoundUrl,
+  background: backgroundSoundUrl,
+  bgm: backgroundSoundUrl,
+} as const;
+
+export {
+  DEFAULT_BGM_VOLUME,
+  BGM_URL,
+  getBgmAudio,
+  playBackgroundMusic,
+  pauseBackgroundMusic,
+  stopBackgroundMusic,
+  isBgmPlaying,
+  isBgmAutoplayBlocked,
+  setBgmVolume,
+  getBgmVolume,
+  handleBgmUserInteraction,
+  initGlobalBgmListeners,
+} from "./bgm";
 
 /**
  * Romantic Sound Effects — Audio files and Web Audio API synthesizer.
@@ -50,15 +79,38 @@ function canPlay(): boolean {
   return getSoundEnabled();
 }
 
-/** Plays an audio asset file with fallback support */
+const lastPlayTimes = new Map<string, number>();
+const MIN_PLAY_INTERVAL_MS = 60; // Blocks duplicate triggers within 60ms for the same audio asset
+
+/** Reset audio debounce state (useful for test isolation) */
+export function _resetAudioCooldowns(): void {
+  lastPlayTimes.clear();
+  stopPeelSound();
+}
+
+/** Plays an audio asset file with fallback support and duplicate click protection */
 function playAudioFile(url: string, volume = 0.85, fallback?: () => void) {
   if (typeof window === "undefined" || !canPlay()) return;
+
+  const now = Date.now();
+  const last = lastPlayTimes.get(url) ?? 0;
+  if (now - last < MIN_PLAY_INTERVAL_MS) {
+    return;
+  }
+  lastPlayTimes.set(url, now);
+
   try {
-    if (typeof Audio === "undefined") {
+    const AudioCtor =
+      typeof window !== "undefined" && window.Audio
+        ? window.Audio
+        : typeof Audio !== "undefined"
+          ? Audio
+          : null;
+    if (!AudioCtor) {
       fallback?.();
       return;
     }
-    const audio = new Audio(url);
+    const audio = new AudioCtor(url);
     audio.volume = Math.max(0, Math.min(1, volume));
     const playPromise = audio.play();
     if (playPromise && typeof playPromise.catch === "function") {
@@ -115,12 +167,12 @@ function tone(
 // ─── Sound library ────────────────────────────────────────────────────────
 
 /**
- * Continue sound — plays continue sound.mp3.
- * Used for dialogue and story "Continue" button clicks.
+ * Continue sound — plays "continue button.wav".
+ * Used strictly for Bunny Mochi's dialogue / conversation buttons.
  */
 export function playContinue() {
   if (!canPlay()) return;
-  playAudioFile(continueSoundUrl, 0.85, () => {
+  playAudioFile(continueButtonSoundUrl, 0.85, () => {
     // Soft chime fallback if audio file cannot play
     const ctx = getCtx();
     if (!ctx) return;
@@ -131,34 +183,33 @@ export function playContinue() {
 }
 
 /**
- * Kept for backward compatibility with components calling playChime.
- * Triggers playContinue() so continue button clicks use continue sound.mp3.
+ * Soft chime for audio toggle button.
+ * Preserves a gentle chime tone without triggering Mochi's conversation sound.
  */
 export function playChime() {
-  playContinue();
-}
-
-/**
- * Magic sparkle — ascending arpeggio.
- * Used when an interactive object is opened on Page 2.
- */
-export function playSparkle() {
   if (!canPlay()) return;
   const ctx = getCtx();
   if (!ctx) return;
   const t = ctx.currentTime;
-  const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
-  notes.forEach((freq, i) => {
-    tone(ctx, freq, t + i * 0.085, 0.01, 0.04, 0.22, 0.2);
-  });
+  tone(ctx, 880, t, 0.01, 0.05, 0.3, 0.22);
+  tone(ctx, 1320, t + 0.12, 0.01, 0.04, 0.28, 0.18);
 }
 
 /**
- * Light switch click — soft "pop" transient.
- * Used when the room lights come on.
+ * Switch sound — plays "switch sound.wav".
+ * Used when the user activates the hidden light switch on Page 2.
  */
-export function playLightSwitch() {
+export function playSwitch() {
   if (!canPlay()) return;
+  playAudioFile(switchSoundUrl, 0.9, () => {
+    playProceduralLightSwitch();
+  });
+}
+
+export const playLightSwitch = playSwitch;
+
+/** Procedural light switch click fallback */
+export function playProceduralLightSwitch() {
   const ctx = getCtx();
   if (!ctx) return;
   const t = ctx.currentTime;
@@ -182,6 +233,37 @@ export function playLightSwitch() {
   src.start(t);
   // Warm "pop" tone alongside
   tone(ctx, 330, t, 0.005, 0.01, 0.08, 0.15, "triangle");
+}
+
+/**
+ * Transmission sound — plays "transmission sound.wav".
+ * Used for screen buttons on the Page 3 transmission / mission control screen.
+ */
+export function playTransmission() {
+  if (!canPlay()) return;
+  playAudioFile(transmissionSoundUrl, 0.9, () => {
+    // Subtle electronic transmission chirp fallback
+    const ctx = getCtx();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    tone(ctx, 1200, t, 0.01, 0.03, 0.12, 0.2, "sawtooth");
+    tone(ctx, 1600, t + 0.05, 0.01, 0.04, 0.16, 0.22, "sine");
+  });
+}
+
+/**
+ * Magic sparkle — ascending arpeggio.
+ * Used when an interactive object is opened on Page 2.
+ */
+export function playSparkle() {
+  if (!canPlay()) return;
+  const ctx = getCtx();
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
+  notes.forEach((freq, i) => {
+    tone(ctx, freq, t + i * 0.085, 0.01, 0.04, 0.22, 0.2);
+  });
 }
 
 /**
@@ -215,15 +297,70 @@ export function playDoorOpen() {
   });
 }
 
+let currentPeelAudio: HTMLAudioElement | null = null;
+
 /**
- * Peeling sound — realistic paper peeling effect.
- * Plays when peeling the screen off from the 1st page.
+ * Stops any currently playing paper-peeling sound effect.
  */
-export function playPeelSound() {
-  if (!canPlay()) return;
-  playAudioFile(peelSoundUrl, 0.95, () => {
-    playProceduralPeel();
-  });
+export function stopPeelSound(): void {
+  if (currentPeelAudio) {
+    try {
+      currentPeelAudio.pause();
+      currentPeelAudio.currentTime = 0;
+    } catch {
+      // ignore
+    }
+    currentPeelAudio = null;
+  }
+}
+
+/**
+ * Paper peeling sound — plays "paper peeling.mp3".
+ * Played exclusively when the paper-peeling animation begins on Page 1.
+ * Prevents overlapping playback, cleans up previous instances, and respects user sound preferences.
+ */
+export function playPeelSound(volume = 0.95): HTMLAudioElement | null {
+  if (typeof window === "undefined" || !canPlay()) return null;
+
+  const now = Date.now();
+  const last = lastPlayTimes.get(paperPeelingSoundUrl) ?? 0;
+  if (now - last < 250) {
+    return null; // duplicate event / re-render suppression
+  }
+  lastPlayTimes.set(paperPeelingSoundUrl, now);
+
+  stopPeelSound();
+
+  try {
+    const AudioCtor =
+      typeof window !== "undefined" && window.Audio
+        ? window.Audio
+        : typeof Audio !== "undefined"
+          ? Audio
+          : null;
+    if (!AudioCtor) return null;
+
+    const audio = new AudioCtor(paperPeelingSoundUrl);
+    audio.volume = Math.max(0, Math.min(1, volume));
+    currentPeelAudio = audio;
+    audio.onended = () => {
+      if (currentPeelAudio === audio) {
+        currentPeelAudio = null;
+      }
+    };
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        if (currentPeelAudio === audio) {
+          currentPeelAudio = null;
+        }
+      });
+    }
+    return audio;
+  } catch {
+    currentPeelAudio = null;
+    return null;
+  }
 }
 
 /** Procedural Web Audio paper peel synthesizer */
