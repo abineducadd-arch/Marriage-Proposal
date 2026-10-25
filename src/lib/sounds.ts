@@ -381,13 +381,14 @@ export function playProceduralPeel() {
   for (let i = 0; i < frameCount; i++) {
     const progress = i / frameCount;
     const white = Math.random() * 2 - 1;
-    lastOut = (lastOut * 0.92) + (white * 0.08);
+    lastOut = lastOut * 0.92 + white * 0.08;
     const crackle = Math.random() > 0.94 ? (Math.random() * 2 - 1) * 0.4 : 0;
-    const env = progress < 0.15
-      ? progress / 0.15
-      : progress < 0.65
-        ? 1.0 - (progress - 0.15) * 0.4
-        : Math.max(0, 0.8 - (progress - 0.65) * 2.2);
+    const env =
+      progress < 0.15
+        ? progress / 0.15
+        : progress < 0.65
+          ? 1.0 - (progress - 0.15) * 0.4
+          : Math.max(0, 0.8 - (progress - 0.65) * 2.2);
     data[i] = (lastOut * 0.7 + crackle + white * 0.15) * env;
   }
 

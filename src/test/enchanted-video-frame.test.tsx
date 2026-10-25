@@ -31,9 +31,7 @@ describe("EnchantedVideoFrame Component", () => {
     expect(screen.getByText(/made with love, just for you/i)).toBeInTheDocument();
 
     // Personal dedication with senderName
-    expect(
-      screen.getByText(/made with all my love, just for you — Leo\. ♡/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/made with all my love, just for you — Leo\. ♡/i)).toBeInTheDocument();
   });
 
   it("renders fallback dedication when senderName is not specified", () => {
@@ -60,7 +58,7 @@ describe("EnchantedVideoFrame Component", () => {
   it("renders video element with original aspect ratio, controls, and aria-label when videoSrc is provided", () => {
     const sampleVideoUrl = "https://example.com/proposal-video.mp4";
     const { container } = render(
-      <EnchantedVideoFrame videoSrc={sampleVideoUrl} senderName="Alex" />
+      <EnchantedVideoFrame videoSrc={sampleVideoUrl} senderName="Alex" />,
     );
 
     const video = container.querySelector("video");
@@ -172,7 +170,7 @@ describe("Page 3 Story Integration with EnchantedVideoFrame", () => {
 
     // Now in tablet scene: Mochi dialogue displayed (first line)
     expect(document.querySelector(".tablet-dialogue")).toHaveTextContent(
-      /wait, wait! i almost forgot something/i
+      /wait, wait! i almost forgot something/i,
     );
 
     // Advance to second tablet line: "Your hero left you a little message... just for you. ♡"
@@ -181,7 +179,7 @@ describe("Page 3 Story Integration with EnchantedVideoFrame", () => {
       fireEvent.click(continueTablet1);
     });
     expect(document.querySelector(".tablet-dialogue")).toHaveTextContent(
-      /your hero left you a little message/i
+      /your hero left you a little message/i,
     );
 
     // Advance to third tablet line: "Here! It's on this tablet..."
@@ -202,11 +200,10 @@ describe("Page 3 Story Integration with EnchantedVideoFrame", () => {
     const enchantedFrame = screen.getByTestId("enchanted-video-frame");
     expect(enchantedFrame).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /a little message from my heart ❤️/i })
+      screen.getByRole("heading", { name: /a little message from my heart ❤️/i }),
     ).toBeInTheDocument();
     expect(screen.getByText(/made with love, just for you/i)).toBeInTheDocument();
 
     vi.useRealTimers();
   });
 });
-

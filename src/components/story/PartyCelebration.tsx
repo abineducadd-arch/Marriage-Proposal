@@ -48,9 +48,23 @@ function drawHeart(
   // Top left curve
   ctx.bezierCurveTo(0, 0, -size / 2, 0, -size / 2, topCurveHeight);
   // Bottom left curve
-  ctx.bezierCurveTo(-size / 2, (size + topCurveHeight) / 2, 0, (size + topCurveHeight) / 1.4, 0, size);
+  ctx.bezierCurveTo(
+    -size / 2,
+    (size + topCurveHeight) / 2,
+    0,
+    (size + topCurveHeight) / 1.4,
+    0,
+    size,
+  );
   // Bottom right curve
-  ctx.bezierCurveTo(0, (size + topCurveHeight) / 1.4, size / 2, (size + topCurveHeight) / 2, size / 2, topCurveHeight);
+  ctx.bezierCurveTo(
+    0,
+    (size + topCurveHeight) / 1.4,
+    size / 2,
+    (size + topCurveHeight) / 2,
+    size / 2,
+    topCurveHeight,
+  );
   // Top right curve
   ctx.bezierCurveTo(size / 2, 0, 0, 0, 0, topCurveHeight);
   ctx.closePath();

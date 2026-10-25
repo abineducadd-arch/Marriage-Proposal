@@ -59,10 +59,7 @@ export function BackgroundMusic() {
   }
 
   return (
-    <aside
-      aria-label="Background music notice"
-      className="fixed bottom-4 left-4 z-40 animate-rise"
-    >
+    <aside aria-label="Background music notice" className="fixed bottom-4 left-4 z-40 animate-rise">
       <button
         type="button"
         id="bgm-play-button"
@@ -73,9 +70,7 @@ export function BackgroundMusic() {
         <span className="text-sm text-rose animate-pulse" aria-hidden="true">
           🎵
         </span>
-        <span className="font-serif italic text-cocoa">
-          Play romantic music ♡
-        </span>
+        <span className="font-serif italic text-cocoa">Play romantic music ♡</span>
       </button>
     </aside>
   );

@@ -35,12 +35,7 @@ function EngravedCornerDetail({ className }: { className: string }) {
       />
 
       {/* Diagonal engraved ray */}
-      <path
-        d="M 4.5 4.5 L 8.5 8.5"
-        stroke="#E5CC91"
-        strokeWidth="1"
-        strokeLinecap="round"
-      />
+      <path d="M 4.5 4.5 L 8.5 8.5" stroke="#E5CC91" strokeWidth="1" strokeLinecap="round" />
 
       {/* Compact royal engraved diamond accent */}
       <polygon

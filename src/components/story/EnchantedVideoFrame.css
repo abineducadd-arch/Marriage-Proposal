@@ -42,13 +42,7 @@
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0.5px;
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #fff2df 30%,
-    #e5cc91 60%,
-    #c9a45c 100%
-  );
+  background: linear-gradient(135deg, #ffffff 0%, #fff2df 30%, #e5cc91 60%, #c9a45c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 14px rgba(201, 164, 92, 0.35));
@@ -146,7 +140,7 @@
 .enchanted-frame-outer {
   position: relative;
   border-radius: 18px;
-  border: 1.5px solid #8A6A3D;
+  border: 1.5px solid #8a6a3d;
   padding: 5px;
   background: color-mix(in oklab, var(--mission-night, #0c0916) 94%, #1e162a);
   box-shadow:
@@ -154,7 +148,9 @@
     0 0 42px rgba(138, 106, 61, 0.12),
     0 16px 40px rgba(5, 3, 10, 0.75);
   overflow: hidden;
-  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  transition:
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
 }
 
 .enchanted-frame-outer:hover {
@@ -183,10 +179,12 @@
 }
 
 @keyframes border-sheen-sweep {
-  0%, 20% {
+  0%,
+  20% {
     transform: translate(-35%, -35%);
   }
-  50%, 100% {
+  50%,
+  100% {
     transform: translate(35%, 35%);
   }
 }
@@ -196,7 +194,7 @@
   position: relative;
   z-index: 2;
   border-radius: 12px;
-  border: 1px solid #C9A45C;
+  border: 1px solid #c9a45c;
   padding: 3px;
   background: rgba(10, 7, 18, 0.6);
   box-shadow:
@@ -309,7 +307,9 @@
   text-indent: 3px;
   border: 1px solid #c9a45c;
   text-shadow: 0 0 8px rgba(229, 204, 145, 0.6);
-  transition: transform 0.25s ease, background 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
 }
 
 .enchanted-placeholder:hover .video-play-icon {
@@ -396,7 +396,8 @@
 }
 
 @keyframes portal-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.65;
   }

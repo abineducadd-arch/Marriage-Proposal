@@ -33,7 +33,7 @@ function generateSparkles(count = 18): SparkleParticle[] {
     const size = 13 + ((i * 7) % 12); // 13px to 25px
     const color = COLORS[i % COLORS.length]!;
     const symbol = SYMBOLS[i % SYMBOLS.length]!;
-    const delay = ((i * 37) % 120); // 0 to 120ms
+    const delay = (i * 37) % 120; // 0 to 120ms
     const rotation = ((i * 43) % 180) - 90;
 
     particles.push({
@@ -65,7 +65,10 @@ export function MagicalPopupSparkles({ active }: { active: boolean }) {
       return;
     }
 
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       return;
     }
 

@@ -4,6 +4,7 @@ import {
   DEFAULT_PROPOSAL_CONFIG,
   getDraftConfig,
   getPublishedConfig,
+  publishConfig,
   type ProposalConfig,
 } from "@/lib/proposal-config";
 import {
@@ -12,6 +13,8 @@ import {
   revokeVideoObjectUrl,
   type VideoTarget,
 } from "@/lib/video-storage";
+import { isSupabaseConfigured } from "@/lib/supabase";
+import { fetchProposalDataFromSupabase } from "@/lib/supabase-service";
 
 export interface UseProposalConfigOptions {
   preview?: boolean;
@@ -37,14 +40,32 @@ export function useProposalConfig(options?: UseProposalConfigOptions) {
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const [isLoadingVideo, setIsLoadingVideo] = useState<boolean>(false);
 
-  // Sync config whenever storage or custom event fires
+  // Sync config whenever storage, Supabase, or custom event fires
   useEffect(() => {
-    const update = () => {
+    let isCancelled = false;
+
+    const updateFromLocal = () => {
       const latest = preview ? getDraftConfig() : getPublishedConfig();
       setConfig(latest);
     };
 
-    update();
+    updateFromLocal();
+
+    // If Supabase is configured, fetch the persistent backend version
+    if (isSupabaseConfigured()) {
+      fetchProposalDataFromSupabase()
+        .then((payload) => {
+          if (isCancelled || !payload || !payload.hasSupabaseData) return;
+          setConfig(payload.config);
+          // Keep local cache synchronized for instant subsequent visits
+          if (!preview) {
+            publishConfig(payload.config);
+          }
+        })
+        .catch((err) => {
+          console.warn("Could not retrieve proposal config from Supabase, using local cache:", err);
+        });
+    }
 
     const handleCustomChange = (e: Event) => {
       const customEvent = e as CustomEvent<{ scope: string; config: ProposalConfig }>;
@@ -54,16 +75,17 @@ export function useProposalConfig(options?: UseProposalConfigOptions) {
           ? customEvent.detail?.scope === "draft"
           : customEvent.detail?.scope === "published")
       ) {
-        update();
+        updateFromLocal();
       }
     };
 
     window.addEventListener(CONFIG_CHANGE_EVENT, handleCustomChange);
-    window.addEventListener("storage", update);
+    window.addEventListener("storage", updateFromLocal);
 
     return () => {
+      isCancelled = true;
       window.removeEventListener(CONFIG_CHANGE_EVENT, handleCustomChange);
-      window.removeEventListener("storage", update);
+      window.removeEventListener("storage", updateFromLocal);
     };
   }, [preview]);
 

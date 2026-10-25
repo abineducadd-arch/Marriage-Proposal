@@ -467,7 +467,12 @@
   /* Warm aged parchment background in antique ivory, beige & soft golden-brown */
   background-color: #f7eee1;
   background-image:
-    radial-gradient(ellipse 95% 90% at 50% 50%, rgba(255, 252, 244, 0.94) 0%, rgba(248, 237, 218, 0.9) 60%, rgba(226, 202, 163, 0.94) 100%),
+    radial-gradient(
+      ellipse 95% 90% at 50% 50%,
+      rgba(255, 252, 244, 0.94) 0%,
+      rgba(248, 237, 218, 0.9) 60%,
+      rgba(226, 202, 163, 0.94) 100%
+    ),
     url("@/assets/story/antique-parchment-texture.jpg");
   background-size: cover, cover;
   background-position: center center;
@@ -765,8 +770,7 @@
 
 .parchment-close-btn:active {
   transform: translateY(0) !important;
-  box-shadow:
-    0 2px 8px rgba(50, 30, 10, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(50, 30, 10, 0.2) !important;
 }
 
 .passage-dialog {

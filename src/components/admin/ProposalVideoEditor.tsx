@@ -22,7 +22,13 @@ import {
   CheckCircle2,
   Sparkles,
   Link as LinkIcon,
+  Cloud,
 } from "lucide-react";
+import { isSupabaseConfigured } from "@/lib/supabase";
+import {
+  uploadProposalVideoToSupabase,
+  removeProposalVideoFromSupabase,
+} from "@/lib/supabase-service";
 
 interface ProposalVideoEditorProps {
   video: VideoMetadata | null;
@@ -107,7 +113,7 @@ export function ProposalVideoEditor({ video, settings, onChange }: ProposalVideo
       return;
     }
 
-    // Begin upload progress simulation and IndexedDB save
+    // Begin upload progress
     setIsUploading(true);
     setUploadProgress(15);
 
@@ -128,9 +134,31 @@ export function ProposalVideoEditor({ video, settings, onChange }: ProposalVideo
         };
       });
 
-      setUploadProgress(50);
+      setUploadProgress(40);
 
-      // Step 2: Store file in IndexedDB
+      let publicUrl: string | undefined;
+      let storagePath: string | undefined;
+
+      // Step 2: Upload to Supabase Storage if configured
+      if (isSupabaseConfigured()) {
+        setUploadProgress(55);
+        const previousPath = video?.storagePath || null;
+        const uploadRes = await uploadProposalVideoToSupabase(
+          file,
+          previousPath,
+          settings.maxVideoSizeMB,
+        );
+
+        if (!uploadRes.success) {
+          throw new Error(uploadRes.error || "Failed to upload video to Supabase Storage.");
+        }
+
+        publicUrl = uploadRes.publicUrl;
+        storagePath = uploadRes.asset?.storage_path;
+        setUploadProgress(85);
+      }
+
+      // Step 3: Cache file in local IndexedDB for offline resilience
       await saveVideoBlob("draft", file, {
         name: file.name,
         size: file.size,
@@ -138,21 +166,29 @@ export function ProposalVideoEditor({ video, settings, onChange }: ProposalVideo
         duration,
       });
 
-      setUploadProgress(85);
-
       const metadata: VideoMetadata = {
         hasVideo: true,
         name: file.name,
         size: file.size,
         type: file.type || "video/mp4",
         duration,
+        externalUrl: publicUrl || video?.externalUrl,
+        storagePath,
         updatedAt: Date.now(),
       };
 
       onChange(metadata);
 
+      if (publicUrl) {
+        setPreviewUrl(publicUrl);
+      }
+
       setUploadProgress(100);
-      setSuccessMessage(`"${file.name}" uploaded successfully!`);
+      setSuccessMessage(
+        isSupabaseConfigured()
+          ? `"${file.name}" uploaded to Supabase Storage successfully!`
+          : `"${file.name}" saved successfully!`,
+      );
       setTimeout(() => {
         setIsUploading(false);
         setUploadProgress(0);
@@ -177,6 +213,9 @@ export function ProposalVideoEditor({ video, settings, onChange }: ProposalVideo
     }
 
     try {
+      if (isSupabaseConfigured() && video?.storagePath) {
+        await removeProposalVideoFromSupabase(video.storagePath);
+      }
       await deleteVideo("draft");
       setPreviewUrl(null);
       setExternalUrlInput("");
@@ -184,6 +223,9 @@ export function ProposalVideoEditor({ video, settings, onChange }: ProposalVideo
       setSuccessMessage("Video removed. Proposal page restored to default placeholder.");
     } catch (err) {
       console.error("Failed to remove video:", err);
+      setErrorMessage(
+        "Failed to remove video: " + (err instanceof Error ? err.message : "Unknown error"),
+      );
     }
   };
 

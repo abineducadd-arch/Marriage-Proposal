@@ -70,7 +70,9 @@ describe("Page 2 Object Pop-Up Centering & Overlay", () => {
           </div>
           <div className="parchment-content-layer">
             <header className="parchment-header">
-              <DialogTitle className="parchment-title font-display">A Little Sweetness for You</DialogTitle>
+              <DialogTitle className="parchment-title font-display">
+                A Little Sweetness for You
+              </DialogTitle>
               <div className="parchment-divider" aria-hidden="true">
                 <span className="divider-line" />
                 <span className="divider-motif">❧ ♡ ☙</span>

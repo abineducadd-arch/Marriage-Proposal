@@ -29,8 +29,9 @@ export interface VideoMetadata {
   name: string;
   size: number;
   type: string;
-  duration?: number;
-  externalUrl?: string;
+  duration?: number | undefined;
+  externalUrl?: string | undefined;
+  storagePath?: string | undefined;
   updatedAt: number;
 }
 
