@@ -34,14 +34,28 @@ export interface MediaAssetRow {
 
 export const SUPABASE_STORAGE_BUCKET = "proposal-media";
 
-// Read environment variables using index signature access for TypeScript noPropertyAccessFromIndexSignature compliance
-const env = import.meta.env as Record<string, string | undefined>;
-const rawUrl = (env["VITE_SUPABASE_URL"] || env["NEXT_PUBLIC_SUPABASE_URL"] || "").trim();
+// Read environment variables supporting both Vite client static replacement and runtime SSR process.env
+const metaEnv = import.meta.env;
+const procEnv = (typeof process !== "undefined" && process.env ? process.env : {}) as Record<
+  string,
+  string | undefined
+>;
+
+const rawUrl = (
+  metaEnv.VITE_SUPABASE_URL ||
+  procEnv["VITE_SUPABASE_URL"] ||
+  metaEnv.NEXT_PUBLIC_SUPABASE_URL ||
+  procEnv["NEXT_PUBLIC_SUPABASE_URL"] ||
+  ""
+).trim();
+
 const rawKey = (
-  env["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
-  env["VITE_SUPABASE_ANON_KEY"] ||
-  env["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"] ||
-  env["NEXT_PUBLIC_SUPABASE_ANON_KEY"] ||
+  metaEnv.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  procEnv["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
+  metaEnv.VITE_SUPABASE_ANON_KEY ||
+  procEnv["VITE_SUPABASE_ANON_KEY"] ||
+  metaEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  procEnv["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"] ||
   ""
 ).trim();
 
