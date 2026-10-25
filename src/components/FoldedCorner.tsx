@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { playPeelSound } from "@/lib/sounds";
 
 type Props = { active: boolean; onPeelComplete: () => void };
 
@@ -12,6 +13,7 @@ export function FoldedCorner({ active, onPeelComplete }: Props) {
   const peel = () => {
     if (!active || peeling) return;
     setPeeling(true);
+    playPeelSound();
     setSize(Math.max(window.innerWidth, window.innerHeight) * 2.2);
     setTimeout(onPeelComplete, 1100);
   };

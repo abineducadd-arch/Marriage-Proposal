@@ -420,3 +420,26 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Object Pop-Up Overlay & Centering Container */
+.object-popup-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.object-popup {
+  position: relative;
+  margin: 0;
+  max-width: min(500px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  pointer-events: auto;
+}

@@ -4,9 +4,7 @@ import { Mochi } from "@/components/Mochi";
 import { MochiGuide } from "@/components/story/MochiGuide";
 import {
   AI_MESSAGES,
-  NO_REACTIONS,
   PROPOSAL_LETTER,
-  nextNoClickStage,
   proposalVideoSrc,
   type ProposalScene,
 } from "@/components/story/proposal";
@@ -14,7 +12,9 @@ import { useProposalConfig } from "@/hooks/use-proposal-config";
 import { getPersonalizedProposalLetter } from "@/lib/proposal-config";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { SoundToggle } from "@/components/SoundToggle";
-import { playChime, playCelebration, playHeartbeat, playNoPop, playTransition } from "@/lib/sounds";
+import { PartyCelebration } from "@/components/story/PartyCelebration";
+import { EnchantedVideoFrame } from "@/components/story/EnchantedVideoFrame";
+import { playContinue, playCelebration, playHeartbeat, playTransition } from "@/lib/sounds";
 import missionRoom from "@/assets/story/mission-control.jpg";
 import "./PageThree.css";
 
@@ -47,11 +47,10 @@ export function PageThree() {
   const [introReady, setIntroReady] = useState(false);
   const [introLine, setIntroLine] = useState(0);
   const [briefingLine, setBriefingLine] = useState(0);
-  const [noStage, setNoStage] = useState(0);
-  const [noVisible, setNoVisible] = useState(true);
+  const [noFlipped, setNoFlipped] = useState(false);
+  const [showSparkles, setShowSparkles] = useState(false);
   const [celebrationLine, setCelebrationLine] = useState(0);
   const [tabletLine, setTabletLine] = useState(0);
-  const [noAnimating, setNoAnimating] = useState(false);
   const celebrationStarted = useRef(false);
 
   useEffect(() => {
@@ -61,24 +60,18 @@ export function PageThree() {
   }, []);
 
   useEffect(() => {
-    if (!noAnimating) return;
-    const delay = noStage >= NO_REACTIONS.length ? 680 : 460;
-    const timer = window.setTimeout(
-      () => {
-        setNoAnimating(false);
-        if (noStage >= NO_REACTIONS.length) setNoVisible(false);
-      },
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : delay,
-    );
+    if (!showSparkles) return;
+    const timer = window.setTimeout(() => setShowSparkles(false), 1400);
     return () => window.clearTimeout(timer);
-  }, [noAnimating, noStage]);
+  }, [showSparkles]);
 
   useEffect(() => {
     if (scene !== "accepting") return;
-    const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 80 : 850;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const delay = reduced ? 80 : noFlipped ? 2600 : 850;
     const timer = window.setTimeout(() => setScene("celebration"), delay);
     return () => window.clearTimeout(timer);
-  }, [scene]);
+  }, [scene, noFlipped]);
 
   const acceptProposal = () => {
     if (celebrationStarted.current) return;
@@ -88,10 +81,10 @@ export function PageThree() {
   };
 
   const clickNo = () => {
-    if (noAnimating || !noVisible) return;
-    playNoPop();
-    setNoAnimating(true);
-    setNoStage((stage) => nextNoClickStage(stage));
+    if (noFlipped) return;
+    setNoFlipped(true);
+    setShowSparkles(true);
+    acceptProposal();
   };
 
   const nextCelebration = () => {
@@ -114,6 +107,7 @@ export function PageThree() {
     <main className={`page-three page-three-${scene}`}>
       <PreviewBanner preview={preview} />
       <SoundToggle />
+      <PartyCelebration active={scene === "accepting" || scene === "celebration"} />
       <img
         className="mission-room-art"
         src={missionRoom}
@@ -186,7 +180,7 @@ export function PageThree() {
               className="mission-button"
               onClick={() => {
                 if (briefingLine < AI_MESSAGES.length - 1) {
-                  playChime();
+                  playContinue();
                   setBriefingLine((line) => line + 1);
                 } else {
                   playTransition();
@@ -252,28 +246,42 @@ export function PageThree() {
               >
                 YES! ♡
               </Button>
-              {noVisible && (
-                <span className={`no-button-wrap no-stage-${noStage}`}>
-                  <Button
-                    variant="outline"
-                    className="no-button"
-                    onClick={clickNo}
-                    disabled={noAnimating || scene === "accepting"}
-                    aria-label={`No, stage ${Math.min(noStage + 1, 3)} of 3`}
-                  >
-                    No...
-                    {noAnimating && (
-                      <span className="shell-fragments" aria-hidden="true">
-                        <i />
-                        <i />
-                        <i />
-                        <i />
-                      </span>
-                    )}
-                  </Button>
-                </span>
-              )}
+              <div className="no-button-wrap">
+                <button
+                  type="button"
+                  className={`btn-flip ${noFlipped ? "is-flipped" : ""}`}
+                  data-front="No"
+                  data-back="Yes! ❤️"
+                  aria-label={noFlipped ? "Yes! ❤️" : "No"}
+                  onClick={clickNo}
+                  disabled={scene === "accepting" && !noFlipped}
+                >
+                  <span className="sr-only">{noFlipped ? "Yes! ❤️" : "No"}</span>
+                </button>
+                {showSparkles && (
+                  <div className="no-button-sparkle-burst" aria-hidden="true">
+                    <span className="sparkle-heart sparkle-heart-1">❤️</span>
+                    <span className="sparkle-heart sparkle-heart-2">💖</span>
+                    <span className="sparkle-star sparkle-star-1">✦</span>
+                    <span className="sparkle-star sparkle-star-2">✨</span>
+                    <span className="sparkle-star sparkle-star-3">✦</span>
+                    <span className="sparkle-star sparkle-star-4">✧</span>
+                    <span className="sparkle-ring" />
+                  </div>
+                )}
+              </div>
             </div>
+            {noFlipped && (
+              <div className="no-flip-congrats" role="status" aria-live="polite">
+                <span className="no-flip-congrats-star" aria-hidden="true">
+                  ✦
+                </span>
+                <span>Surprise! You just said YES! ❤️</span>
+                <span className="no-flip-congrats-star" aria-hidden="true">
+                  ✦
+                </span>
+              </div>
+            )}
           </section>
         )}
 
@@ -286,7 +294,11 @@ export function PageThree() {
               <i>✧</i>
               <i>✦</i>
             </div>
-            <h1>MISSION ACCOMPLISHED! ♡</h1>
+            <div className="celebration-badge" aria-hidden="true">
+              <span>✦</span> MISSION ACCOMPLISHED <span>✦</span>
+            </div>
+            <h1 className="celebration-main-title">SHE SAID YES! ❤️</h1>
+            <p className="celebration-sub-title font-hand">Our forever begins here...</p>
             {celebrationLine < AI_CELEBRATION_LINES.length ? (
               <>
                 <p className="ai-caption">FICTIONAL STORY TRANSMISSION</p>
@@ -304,7 +316,7 @@ export function PageThree() {
             <Button
               className="mission-button"
               onClick={() => {
-                playChime();
+                playContinue();
                 nextCelebration();
               }}
             >
@@ -316,48 +328,31 @@ export function PageThree() {
         )}
 
         {(scene === "tablet" || scene === "video") && (
-          <section className="screen-content tablet-content" aria-live="polite">
-            <div className="tablet-scene">
-              <div className="tablet-device">
-                <div className="tablet-screen">
-                  {scene === "video" && activeVideoSrc ? (
-                    <video
-                      controls
-                      playsInline
-                      preload="metadata"
-                      src={activeVideoSrc}
-                      aria-label="A personal message from your hero"
-                    />
-                  ) : scene === "video" ? (
-                    <div className="video-placeholder">
-                      <span className="video-play-icon" aria-hidden="true">
-                        ▶
-                      </span>
-                      <p>A little message just for you ♡</p>
-                      <span>Your special video will appear here.</span>
-                    </div>
-                  ) : (
-                    <div className="tablet-preview">
-                      <span aria-hidden="true">♡</span>
-                      <p>A message is waiting</p>
-                    </div>
-                  )}
-                </div>
-                <span className="tablet-camera" aria-hidden="true" />
-              </div>
-              {scene === "tablet" && (
-                <div className="tablet-mochi">
-                  <Mochi expression="happy" />
-                </div>
-              )}
-            </div>
+          <section
+            className={`screen-content ${scene === "video" ? "video-content" : "tablet-content"}`}
+            aria-live="polite"
+          >
             {scene === "tablet" ? (
               <>
+                <div className="tablet-scene">
+                  <div className="tablet-device">
+                    <div className="tablet-screen">
+                      <div className="tablet-preview">
+                        <span aria-hidden="true">♡</span>
+                        <p>A message is waiting</p>
+                      </div>
+                    </div>
+                    <span className="tablet-camera" aria-hidden="true" />
+                  </div>
+                  <div className="tablet-mochi">
+                    <Mochi expression="happy" />
+                  </div>
+                </div>
                 <p className="tablet-dialogue">{TABLET_LINES[tabletLine]}</p>
                 <Button
                   className="mission-button"
                   onClick={() => {
-                    playChime();
+                    playContinue();
                     nextTabletLine();
                   }}
                 >
@@ -365,13 +360,10 @@ export function PageThree() {
                 </Button>
               </>
             ) : (
-              <>
-                <p className="video-dedication">
-                  {config.personalDetails.senderName
-                    ? `Made with all my love, just for you — ${config.personalDetails.senderName}. ♡`
-                    : "Made with all my love, just for you. ♡"}
-                </p>
-              </>
+              <EnchantedVideoFrame
+                videoSrc={activeVideoSrc}
+                senderName={config.personalDetails.senderName}
+              />
             )}
           </section>
         )}
@@ -388,8 +380,8 @@ export function PageThree() {
               scene === "incoming"
                 ? "curious"
                 : scene === "proposal"
-                  ? noStage > 0
-                    ? "worried"
+                  ? noFlipped
+                    ? "laughing"
                     : "curious"
                   : scene === "celebration"
                     ? "laughing"
@@ -401,8 +393,8 @@ export function PageThree() {
                 : scene === "incoming"
                   ? "Wait... a message? I wonder who it's from! 👀"
                   : scene === "proposal"
-                    ? noStage > 0
-                      ? (NO_REACTIONS[noStage - 1] ?? "")
+                    ? noFlipped
+                      ? "Hehe! I knew you'd say yes! ♡"
                       : "Take all the time you need, sweetheart. Whatever you decide is okay. ♡"
                     : scene === "celebration"
                       ? (MOCHI_CELEBRATION_LINES[celebrationLine - AI_CELEBRATION_LINES.length] ??

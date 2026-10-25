@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { MochiGuide } from "@/components/story/MochiGuide";
 import { DarkRoom } from "@/components/story/DarkRoom";
 import { ObjectArtwork } from "@/components/story/ObjectArtwork";
+import { MagicalPopupSparkles } from "@/components/story/MagicalPopupSparkles";
 import {
   OBJECTS,
   SWITCH_POSITION,
@@ -17,7 +18,7 @@ import { useProposalConfig } from "@/hooks/use-proposal-config";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { SoundToggle } from "@/components/SoundToggle";
 import {
-  playChime,
+  playContinue,
   playDoorOpen,
   playLightSwitch,
   playSparkle,
@@ -55,7 +56,8 @@ export function PageTwo({
   const [hint, setHint] = useState(false);
   const hinted = useRef(false);
   const [visited, setVisited] = useState<ObjectId[]>([]);
-  const [object, setObject] = useState<ObjectId | null>(null);
+  const [activeObject, setActiveObject] = useState<ObjectId | null>(null);
+  const [objectOpen, setObjectOpen] = useState(false);
   const [passage, setPassage] = useState(false);
   const [exitAcknowledged, setExitAcknowledged] = useState(false);
   const unlocked = passageUnlocked(visited);
@@ -73,7 +75,8 @@ export function PageTwo({
 
   const openObject = (id: ObjectId) => {
     playSparkle();
-    setObject(id);
+    setActiveObject(id);
+    setObjectOpen(true);
     const next = exploreObject(visited, id);
     setVisited(next);
     // Fire unlock sound exactly once when all three are found
@@ -83,11 +86,11 @@ export function PageTwo({
     }
   };
   const roomScene = scene === "dark" || scene === "lit";
-  const currentObject = object
+  const currentObject = activeObject
     ? {
-        title: config.pageTwo[object]?.title || OBJECTS[object].title,
-        clue: config.pageTwo[object]?.clue || OBJECTS[object].clue,
-        dialogue: OBJECTS[object].dialogue,
+        title: config.pageTwo[activeObject]?.title || OBJECTS[activeObject].title,
+        clue: config.pageTwo[activeObject]?.clue || OBJECTS[activeObject].clue,
+        dialogue: OBJECTS[activeObject].dialogue,
       }
     : null;
   return (
@@ -196,6 +199,7 @@ export function PageTwo({
                 className="secret-passage"
                 aria-label="Open the secret passage"
                 onClick={() => {
+                  playDoorOpen();
                   setExitAcknowledged(true);
                   setPassage(true);
                 }}
@@ -212,7 +216,7 @@ export function PageTwo({
               text={DARK_LINES[darkLine] ?? ""}
               action="Continue ♡"
               onAction={() => {
-                playChime();
+                playContinue();
                 setDarkLine((n) => n + 1);
               }}
             />
@@ -232,18 +236,18 @@ export function PageTwo({
               text={LIGHT_LINES[lightLine] ?? ""}
               action={lightLine === LIGHT_LINES.length - 1 ? "Let's explore! ♡" : "Continue ♡"}
               onAction={() => {
-                playChime();
+                playContinue();
                 setLightLine((n) => n + 1);
               }}
             />
           )}
-          {scene === "lit" && unlocked && !object && !passage && !exitAcknowledged && (
+          {scene === "lit" && unlocked && !objectOpen && !passage && !exitAcknowledged && (
             <MochiGuide
               expression="curious"
               text="Wait a second... was that little door there before? I think we've discovered something! ♡"
               action="Let's take a look ♡"
               onAction={() => {
-                playTransition();
+                playDoorOpen();
                 setExitAcknowledged(true);
                 setPassage(true);
               }}
@@ -253,22 +257,23 @@ export function PageTwo({
         </>
       )}
       <Dialog
-        open={Boolean(object)}
+        open={objectOpen}
         onOpenChange={(open) => {
-          if (!open) setObject(null);
+          setObjectOpen(open);
         }}
       >
-        {currentObject && object && (
+        {currentObject && activeObject && (
           <DialogContent className="clue-dialog">
+            <MagicalPopupSparkles active={objectOpen} />
             <DialogTitle className="font-hand">{currentObject.title}</DialogTitle>
             <div className="opened-object">
-              <ObjectArtwork kind={object} />
+              <ObjectArtwork kind={activeObject} />
             </div>
             <blockquote className="handwritten-note">{currentObject.clue}</blockquote>
             <DialogDescription className="clue-dialogue">
               {currentObject.dialogue}
             </DialogDescription>
-            <Button className="story-action" onClick={() => setObject(null)}>
+            <Button className="story-action" onClick={() => setObjectOpen(false)}>
               Close
             </Button>
           </DialogContent>
@@ -276,12 +281,17 @@ export function PageTwo({
       </Dialog>
       <Dialog open={passage} onOpenChange={setPassage}>
         <DialogContent className="clue-dialog passage-dialog">
+          <MagicalPopupSparkles active={passage} />
           <DialogTitle className="font-hand">Another little door…</DialogTitle>
           <DialogDescription>
             Ooooh... I think our next adventure is hiding behind this one!
           </DialogDescription>
           <Button asChild className="story-action">
-            <Link to={nextPageRoute} {...(preview ? { search: () => ({ preview: "true" }) } : {})}>
+            <Link
+              to={nextPageRoute}
+              onClick={() => playContinue()}
+              {...(preview ? { search: () => ({ preview: "true" }) } : {})}
+            >
               Continue the adventure ♡
             </Link>
           </Button>

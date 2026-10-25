@@ -1,9 +1,10 @@
+import continueSoundUrl from "@/assets/sounds/continue-sound.mp3";
+import doorSoundUrl from "@/assets/sounds/door-sound.mp3";
+import peelSoundUrl from "@/assets/sounds/peel-sound.wav";
+
 /**
- * Romantic Sound Effects — Web Audio API synthesizer.
- * All sounds are generated procedurally; no audio files are needed.
- *
- * Sounds are silenced when the user has enabled reduced-motion preferences
- * OR when sounds are disabled via the proposal config settings.
+ * Romantic Sound Effects — Audio files and Web Audio API synthesizer.
+ * Sounds are silenced when muted via the proposal sound toggle.
  */
 
 const STORAGE_KEY = "romantic_sounds_enabled";
@@ -47,6 +48,27 @@ function getCtx(): AudioContext | null {
 
 function canPlay(): boolean {
   return getSoundEnabled();
+}
+
+/** Plays an audio asset file with fallback support */
+function playAudioFile(url: string, volume = 0.85, fallback?: () => void) {
+  if (typeof window === "undefined" || !canPlay()) return;
+  try {
+    if (typeof Audio === "undefined") {
+      fallback?.();
+      return;
+    }
+    const audio = new Audio(url);
+    audio.volume = Math.max(0, Math.min(1, volume));
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        fallback?.();
+      });
+    }
+  } catch {
+    fallback?.();
+  }
 }
 
 // ─── Low-level helpers ────────────────────────────────────────────────────
@@ -93,16 +115,27 @@ function tone(
 // ─── Sound library ────────────────────────────────────────────────────────
 
 /**
- * Soft chime — gentle two-note sparkle.
- * Used for dialogue "Continue" button clicks.
+ * Continue sound — plays continue sound.mp3.
+ * Used for dialogue and story "Continue" button clicks.
+ */
+export function playContinue() {
+  if (!canPlay()) return;
+  playAudioFile(continueSoundUrl, 0.85, () => {
+    // Soft chime fallback if audio file cannot play
+    const ctx = getCtx();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    tone(ctx, 880, t, 0.01, 0.05, 0.3, 0.22);
+    tone(ctx, 1320, t + 0.12, 0.01, 0.04, 0.28, 0.18);
+  });
+}
+
+/**
+ * Kept for backward compatibility with components calling playChime.
+ * Triggers playContinue() so continue button clicks use continue sound.mp3.
  */
 export function playChime() {
-  if (!canPlay()) return;
-  const ctx = getCtx();
-  if (!ctx) return;
-  const t = ctx.currentTime;
-  tone(ctx, 880, t, 0.01, 0.05, 0.3, 0.22);
-  tone(ctx, 1320, t + 0.12, 0.01, 0.04, 0.28, 0.18);
+  playContinue();
 }
 
 /**
@@ -152,31 +185,128 @@ export function playLightSwitch() {
 }
 
 /**
- * Door creak / open — low-frequency sweep.
- * Used when the mysterious door is opened on Page 2.
+ * Door creak / open effect — uses door sound.mp3.
+ * Used when the mysterious door or secret passage is opened on Page 2.
  */
 export function playDoorOpen() {
+  if (!canPlay()) return;
+  playAudioFile(doorSoundUrl, 0.9, () => {
+    // Procedural creak fallback
+    const ctx = getCtx();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(120, t);
+    osc.frequency.exponentialRampToValueAtTime(55, t + 0.6);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.18, t + 0.05);
+    gain.gain.linearRampToValueAtTime(0.08, t + 0.55);
+    gain.gain.linearRampToValueAtTime(0, t + 0.75);
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 600;
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.8);
+  });
+}
+
+/**
+ * Peeling sound — realistic paper peeling effect.
+ * Plays when peeling the screen off from the 1st page.
+ */
+export function playPeelSound() {
+  if (!canPlay()) return;
+  playAudioFile(peelSoundUrl, 0.95, () => {
+    playProceduralPeel();
+  });
+}
+
+/** Procedural Web Audio paper peel synthesizer */
+export function playProceduralPeel() {
   if (!canPlay()) return;
   const ctx = getCtx();
   if (!ctx) return;
   const t = ctx.currentTime;
-  const osc = ctx.createOscillator();
+  const duration = 1.1;
+
+  // Textured paper noise
+  const sampleRate = ctx.sampleRate;
+  const frameCount = Math.floor(sampleRate * duration);
+  const buffer = ctx.createBuffer(1, frameCount, sampleRate);
+  const data = buffer.getChannelData(0);
+
+  let lastOut = 0.0;
+  for (let i = 0; i < frameCount; i++) {
+    const progress = i / frameCount;
+    const white = Math.random() * 2 - 1;
+    lastOut = (lastOut * 0.92) + (white * 0.08);
+    const crackle = Math.random() > 0.94 ? (Math.random() * 2 - 1) * 0.4 : 0;
+    const env = progress < 0.15
+      ? progress / 0.15
+      : progress < 0.65
+        ? 1.0 - (progress - 0.15) * 0.4
+        : Math.max(0, 0.8 - (progress - 0.65) * 2.2);
+    data[i] = (lastOut * 0.7 + crackle + white * 0.15) * env;
+  }
+
+  const noiseSource = ctx.createBufferSource();
+  noiseSource.buffer = buffer;
+
+  const bandpass = ctx.createBiquadFilter();
+  bandpass.type = "bandpass";
+  bandpass.frequency.setValueAtTime(600, t);
+  bandpass.frequency.exponentialRampToValueAtTime(3000, t + 0.5);
+  bandpass.frequency.exponentialRampToValueAtTime(1000, t + duration);
+  bandpass.Q.setValueAtTime(1.8, t);
+
+  const highpass = ctx.createBiquadFilter();
+  highpass.type = "highpass";
+  highpass.frequency.setValueAtTime(400, t);
+
   const gain = ctx.createGain();
-  osc.type = "sawtooth";
-  osc.frequency.setValueAtTime(120, t);
-  osc.frequency.exponentialRampToValueAtTime(55, t + 0.6);
   gain.gain.setValueAtTime(0, t);
-  gain.gain.linearRampToValueAtTime(0.18, t + 0.05);
-  gain.gain.linearRampToValueAtTime(0.08, t + 0.55);
-  gain.gain.linearRampToValueAtTime(0, t + 0.75);
-  const filter = ctx.createBiquadFilter();
-  filter.type = "lowpass";
-  filter.frequency.value = 600;
-  osc.connect(filter);
-  filter.connect(gain);
+  gain.gain.linearRampToValueAtTime(0.4, t + 0.08);
+  gain.gain.setValueAtTime(0.35, t + 0.4);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+  noiseSource.connect(bandpass);
+  bandpass.connect(highpass);
+  highpass.connect(gain);
   gain.connect(ctx.destination);
-  osc.start(t);
-  osc.stop(t + 0.8);
+
+  noiseSource.start(t);
+  noiseSource.stop(t + duration);
+
+  // Aerodynamic swoosh
+  const whooshOsc = ctx.createOscillator();
+  const whooshGain = ctx.createGain();
+  const whooshFilter = ctx.createBiquadFilter();
+
+  whooshOsc.type = "sine";
+  whooshOsc.frequency.setValueAtTime(160, t + 0.2);
+  whooshOsc.frequency.exponentialRampToValueAtTime(70, t + 0.85);
+
+  whooshFilter.type = "lowpass";
+  whooshFilter.frequency.setValueAtTime(350, t + 0.2);
+
+  whooshGain.gain.setValueAtTime(0, t + 0.2);
+  whooshGain.gain.linearRampToValueAtTime(0.18, t + 0.45);
+  whooshGain.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+
+  whooshOsc.connect(whooshFilter);
+  whooshFilter.connect(whooshGain);
+  whooshGain.connect(ctx.destination);
+
+  whooshOsc.start(t + 0.2);
+  whooshOsc.stop(t + 0.95);
+
+  // Soft sparkle tone
+  tone(ctx, 1046.5, t + 0.65, 0.01, 0.04, 0.35, 0.08);
 }
 
 /**

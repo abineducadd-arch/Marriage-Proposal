@@ -7,7 +7,7 @@ import { useProposalConfig } from "@/hooks/use-proposal-config";
 import { getWelcomeDialogue } from "@/lib/proposal-config";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { SoundToggle } from "@/components/SoundToggle";
-import { playChime, playTransition } from "@/lib/sounds";
+import { playContinue, playTransition } from "@/lib/sounds";
 
 export const DIALOGUE: { text: string; expression: MochiExpression }[] = [
   { text: "Hiii, you! ♡", expression: "happy" },
@@ -43,7 +43,7 @@ export function WelcomePage({ onNext }: { onNext?: () => void }) {
       setIntroComplete(true);
       return;
     }
-    playChime();
+    playContinue();
     busy.current = true;
     setTextVisible(false);
     setTimeout(() => {
