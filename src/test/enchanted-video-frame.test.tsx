@@ -1,6 +1,8 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { EnchantedVideoFrame } from "@/components/story/EnchantedVideoFrame";
+import * as bgm from "@/lib/bgm";
+import * as sounds from "@/lib/sounds";
 
 // Mock canvas-confetti
 vi.mock("canvas-confetti", () => ({
@@ -8,8 +10,15 @@ vi.mock("canvas-confetti", () => ({
 }));
 
 beforeAll(() => {
-  window.HTMLMediaElement.prototype.play = vi.fn().mockResolvedValue(undefined);
+  window.HTMLMediaElement.prototype.play = vi.fn().mockImplementation(function (this: HTMLMediaElement) {
+    this.paused = false;
+    return Promise.resolve();
+  });
+  window.HTMLMediaElement.prototype.pause = vi.fn().mockImplementation(function (this: HTMLMediaElement) {
+    this.paused = true;
+  });
 });
+
 
 describe("EnchantedVideoFrame Component", () => {
   it("renders the enchanted holographic video frame container and headers", () => {
@@ -207,3 +216,193 @@ describe("Page 3 Story Integration with EnchantedVideoFrame", () => {
     vi.useRealTimers();
   });
 });
+
+describe("Background Music Control During Proposal Video Playback", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sounds.setSoundEnabled(true);
+    bgm._resetBgmForTesting();
+  });
+
+  afterEach(() => {
+    bgm._resetBgmForTesting();
+    vi.clearAllMocks();
+  });
+
+  it("pauses background music when final proposal video begins playing", async () => {
+    // Start background music
+    await bgm.playBackgroundMusic();
+    expect(bgm.isBgmPlaying()).toBe(true);
+
+    const pauseSpy = vi.spyOn(bgm, "pauseBgmForVideo");
+    const { container } = render(
+      <EnchantedVideoFrame videoSrc="https://example.com/proposal.mp4" senderName="Alex" />,
+    );
+
+    const video = container.querySelector("video");
+    expect(video).toBeInTheDocument();
+
+    // Video begins playing
+    act(() => {
+      fireEvent.play(video!);
+    });
+
+    expect(pauseSpy).toHaveBeenCalled();
+    expect(bgm.isBgmPlaying()).toBe(false);
+    expect(bgm.isVideoBgmActive()).toBe(true);
+  });
+
+  it("keeps background music paused while video is paused but remains open", async () => {
+    await bgm.playBackgroundMusic();
+    const playSpy = vi.spyOn(bgm, "playBackgroundMusic");
+
+    const { container } = render(
+      <EnchantedVideoFrame videoSrc="https://example.com/proposal.mp4" />,
+    );
+    const video = container.querySelector("video");
+
+    act(() => {
+      fireEvent.play(video!);
+    });
+
+    playSpy.mockClear();
+
+    // User pauses video
+    act(() => {
+      fireEvent.pause(video!);
+    });
+
+    // BGM should NOT resume while video is still open
+    expect(playSpy).not.toHaveBeenCalled();
+    expect(bgm.isVideoBgmActive()).toBe(true);
+  });
+
+  it("resumes background music from previous position when video finishes naturally (ended)", async () => {
+    await bgm.playBackgroundMusic();
+    const bgmAudio = bgm.getBgmAudio();
+    if (bgmAudio) {
+      bgmAudio.currentTime = 42; // simulate progress
+    }
+
+    const { container } = render(
+      <EnchantedVideoFrame videoSrc="https://example.com/proposal.mp4" />,
+    );
+    const video = container.querySelector("video");
+
+    act(() => {
+      fireEvent.play(video!);
+    });
+    expect(bgm.isVideoBgmActive()).toBe(true);
+
+    const playSpy = vi.spyOn(bgm, "playBackgroundMusic");
+
+    // Video ends naturally
+    act(() => {
+      fireEvent.ended(video!);
+    });
+
+    expect(playSpy).toHaveBeenCalled();
+    expect(bgm.isVideoBgmActive()).toBe(false);
+    expect(bgmAudio?.currentTime).toBe(42); // Previous position preserved
+  });
+
+  it("restores background music appropriately when video is closed/unmounted before completion", async () => {
+    await bgm.playBackgroundMusic();
+
+    const { container, unmount } = render(
+      <EnchantedVideoFrame videoSrc="https://example.com/proposal.mp4" />,
+    );
+    const video = container.querySelector("video");
+
+    act(() => {
+      fireEvent.play(video!);
+    });
+
+    const playSpy = vi.spyOn(bgm, "playBackgroundMusic");
+
+    // Video closed early (unmounted)
+    unmount();
+
+    expect(playSpy).toHaveBeenCalled();
+    expect(bgm.isVideoBgmActive()).toBe(false);
+  });
+
+  it("does not leave background music permanently paused if video fails to load or play", async () => {
+    await bgm.playBackgroundMusic();
+
+    const { container } = render(
+      <EnchantedVideoFrame videoSrc="https://example.com/bad-video.mp4" />,
+    );
+    const video = container.querySelector("video");
+
+    act(() => {
+      fireEvent.play(video!);
+    });
+
+    const playSpy = vi.spyOn(bgm, "playBackgroundMusic");
+
+    // Video error occurs
+    act(() => {
+      fireEvent.error(video!);
+    });
+
+    expect(playSpy).toHaveBeenCalled();
+    expect(bgm.isVideoBgmActive()).toBe(false);
+  });
+
+  it("does not turn music back on if user had manually muted sound", async () => {
+    // User had muted sound
+    sounds.setSoundEnabled(false);
+    expect(bgm.isBgmPlaying()).toBe(false);
+
+    const { container } = render(
+      <EnchantedVideoFrame videoSrc="https://example.com/proposal.mp4" />,
+    );
+    const video = container.querySelector("video");
+
+    act(() => {
+      fireEvent.play(video!);
+    });
+
+    const playSpy = vi.spyOn(bgm, "playBackgroundMusic");
+
+    // Video ends
+    act(() => {
+      fireEvent.ended(video!);
+    });
+
+    // Should NOT force background music to play when muted
+    expect(playSpy).not.toHaveBeenCalled();
+  });
+
+  it("handles video replacement and repeated openings without duplicate listeners", async () => {
+    await bgm.playBackgroundMusic();
+
+    const { container, rerender, unmount } = render(
+      <EnchantedVideoFrame videoSrc="https://example.com/video1.mp4" />,
+    );
+
+    let video = container.querySelector("video");
+    act(() => {
+      fireEvent.play(video!);
+    });
+
+    // Replace video
+    rerender(<EnchantedVideoFrame videoSrc="https://example.com/video2.mp4" />);
+    video = container.querySelector("video");
+
+    act(() => {
+      fireEvent.play(video!);
+    });
+
+    const playSpy = vi.spyOn(bgm, "playBackgroundMusic");
+    act(() => {
+      fireEvent.ended(video!);
+    });
+
+    expect(playSpy).toHaveBeenCalledTimes(1);
+
+    unmount();
+  });
+});
+

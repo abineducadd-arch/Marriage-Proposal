@@ -1,5 +1,5 @@
-import { getSoundEnabled } from "./sounds";
-import { setBgmVolume, DEFAULT_BGM_VOLUME, isBgmPlaying } from "./bgm";
+import { getSoundEnabled, getSharedAudioContext } from "./sounds";
+import { setBgmVolume, DEFAULT_BGM_VOLUME, isBgmPlaying, isVideoBgmActive } from "./bgm";
 
 /**
  * Client-Side Mochi Voice Coordinator.
@@ -122,9 +122,9 @@ export function isMochiSpeaking(): boolean {
 // ─── Preference helpers ──────────────────────────────────────────────────────
 
 export function getMochiVoiceEnabled(): boolean {
-  if (typeof localStorage === "undefined") return true;
+  if (typeof localStorage === "undefined") return false;
   const stored = localStorage.getItem(STORAGE_KEY);
-  return stored === null ? false : stored === "true";
+  return stored === "true";
 }
 
 export function setMochiVoiceEnabled(enabled: boolean): void {
@@ -166,7 +166,7 @@ function duckBgm() {
 }
 
 function restoreBgm() {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isVideoBgmActive()) return;
   if (bgmDucked) {
     bgmDucked = false;
     setBgmVolume(DEFAULT_BGM_VOLUME);
@@ -249,14 +249,10 @@ export async function playBunnyCharacterVoice(
   notifySpeechState(true);
 
   // Attempt Web Audio API for instantaneous, frame-accurate playback
-  const AudioContextCtor =
-    window.AudioContext ||
-    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  const ctx = getSharedAudioContext();
 
-  if (AudioContextCtor) {
+  if (ctx) {
     try {
-      const ctx = new AudioContextCtor();
-
       // Load and decode buffer once
       if (!cachedBunnyAudioBuffer && !isDecodingBunnyVoice) {
         isDecodingBunnyVoice = true;

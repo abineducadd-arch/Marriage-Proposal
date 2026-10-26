@@ -124,8 +124,8 @@ describe("Mochi Character Voice System", () => {
   });
 
   describe("3. Client voice preferences & mute control", () => {
-    it("defaults to voice enabled if nothing in localStorage", () => {
-      expect(getMochiVoiceEnabled()).toBe(true);
+    it("defaults to voice disabled if nothing in localStorage", () => {
+      expect(getMochiVoiceEnabled()).toBe(false);
     });
 
     it("persists voice mute/unmute state in localStorage", () => {

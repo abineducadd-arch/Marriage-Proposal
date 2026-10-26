@@ -14,6 +14,8 @@ let bgmAudioInstance: HTMLAudioElement | null = null;
 let isAutoplayBlocked = false;
 let userHasInteracted = false;
 let isInitialized = false;
+let isVideoControllingBgm = false;
+let wasBgmPlayingBeforeVideo = false;
 
 const stateListeners = new Set<() => void>();
 
@@ -83,6 +85,11 @@ export function isBgmAutoplayBlocked(): boolean {
   return isAutoplayBlocked;
 }
 
+/** Returns whether proposal video playback currently controls the background music */
+export function isVideoBgmActive(): boolean {
+  return isVideoControllingBgm;
+}
+
 /** Set background music volume safely (0.0 to 1.0) */
 export function setBgmVolume(volume: number): void {
   const audio = getBgmAudio();
@@ -104,7 +111,7 @@ if (typeof window !== "undefined") {
   window.addEventListener("romantic_sound_pref_changed", (e: Event) => {
     const { enabled } = (e as CustomEvent<{ enabled: boolean }>).detail ?? {};
     if (enabled) {
-      if (userHasInteracted || !isAutoplayBlocked) {
+      if (!isVideoControllingBgm && (userHasInteracted || !isAutoplayBlocked)) {
         playBackgroundMusic().catch(() => {});
       }
     } else {
@@ -116,9 +123,15 @@ if (typeof window !== "undefined") {
 /**
  * Starts or resumes background music playback.
  * Preserves the existing playback position across page navigation.
+ * Will not play over the video if video is currently controlling playback.
  */
-export async function playBackgroundMusic(): Promise<boolean> {
+export async function playBackgroundMusic(force = false): Promise<boolean> {
   if (typeof window === "undefined") return false;
+
+  // Do not play background music while video has control unless forced
+  if (!force && isVideoControllingBgm) {
+    return false;
+  }
 
   // Respect user sound preference (mute toggle)
   if (!getSoundEnabled()) {
@@ -198,10 +211,53 @@ export function stopBackgroundMusic(): void {
 }
 
 /**
+ * Called when the proposal video actually begins playing.
+ * Pauses background music so video audio is crystal clear,
+ * and remembers whether background music was playing before the video started.
+ */
+export function pauseBgmForVideo(): void {
+  if (typeof window === "undefined") return;
+  if (!isVideoControllingBgm) {
+    wasBgmPlayingBeforeVideo = isBgmPlaying();
+    isVideoControllingBgm = true;
+  }
+  pauseBackgroundMusic();
+}
+
+/**
+ * Called when the proposal video finishes naturally (ended), encounters an error,
+ * or when the video modal is closed.
+ * Resumes background music from its previous position ONLY if it was playing before
+ * the video began, and user sound preferences permit.
+ */
+export function resumeBgmAfterVideo(): void {
+  if (typeof window === "undefined") return;
+  const shouldResume = wasBgmPlayingBeforeVideo && getSoundEnabled();
+  isVideoControllingBgm = false;
+  wasBgmPlayingBeforeVideo = false;
+
+  if (shouldResume) {
+    playBackgroundMusic().catch(() => {});
+  }
+}
+
+/**
+ * Clean up or release video control when component unmounts or video changes.
+ */
+export function releaseBgmFromVideo(): void {
+  if (isVideoControllingBgm) {
+    resumeBgmAfterVideo();
+  }
+}
+
+/**
  * Handles user interaction to unlock and start background music.
  */
 export function handleBgmUserInteraction(): void {
   userHasInteracted = true;
+  if (isVideoControllingBgm) {
+    return;
+  }
   if (getSoundEnabled() && !isBgmPlaying()) {
     playBackgroundMusic().catch(() => {});
   }
@@ -240,7 +296,7 @@ export function initGlobalBgmListeners(): () => void {
   const onSoundPrefChanged = (e: Event) => {
     const { enabled } = (e as CustomEvent<{ enabled: boolean }>).detail ?? {};
     if (enabled) {
-      if (userHasInteracted || !isAutoplayBlocked) {
+      if (!isVideoControllingBgm && (userHasInteracted || !isAutoplayBlocked)) {
         playBackgroundMusic().catch(() => {});
       }
     } else {
@@ -276,6 +332,9 @@ export function _resetBgmForTesting(): void {
   isAutoplayBlocked = false;
   userHasInteracted = false;
   isInitialized = false;
+  isVideoControllingBgm = false;
+  wasBgmPlayingBeforeVideo = false;
   playPromiseInProgress = null;
   stateListeners.clear();
 }
+

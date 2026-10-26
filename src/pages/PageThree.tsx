@@ -46,11 +46,12 @@ const TABLET_LINES = [
 ] as const;
 
 export function PageThree() {
-  const { config, preview, videoSrc } = useProposalConfig();
+  const [scene, setScene] = useState<ProposalScene>("intro");
+  const shouldLoadVideo = scene === "tablet" || scene === "video";
+  const { config, preview, videoSrc } = useProposalConfig({ loadVideo: shouldLoadVideo });
   const activeVideoSrc = videoSrc || proposalVideoSrc;
   const proposalLetter = getPersonalizedProposalLetter(config.personalDetails);
 
-  const [scene, setScene] = useState<ProposalScene>("intro");
   const [introReady, setIntroReady] = useState(false);
   const [introLine, setIntroLine] = useState(0);
   const [briefingLine, setBriefingLine] = useState(0);
@@ -129,6 +130,7 @@ export function PageThree() {
         width={1536}
         height={1024}
         fetchPriority="high"
+        decoding="async"
       />
       <div className="mission-room-shade" aria-hidden="true" />
       <div className="mission-screen" aria-label="Interdimensional Mission Control">
@@ -163,7 +165,14 @@ export function PageThree() {
               </Button>
             )}
             {!introReady && (
-              <Button variant="ghost" className="skip-intro" onClick={() => setIntroReady(true)}>
+              <Button
+                variant="ghost"
+                className="skip-intro"
+                onClick={() => {
+                  playTransmission();
+                  setIntroReady(true);
+                }}
+              >
                 Skip intro
               </Button>
             )}

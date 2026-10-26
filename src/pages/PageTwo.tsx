@@ -32,10 +32,12 @@ import {
   playSparkle,
   playTransition,
   playUnlock,
+  preloadSoundEffects,
 } from "@/lib/sounds";
 import hallway from "@/assets/story/door-hallway.jpg";
 import room from "@/assets/story/secret-room.jpg";
 import vintageCoupleImg from "@/assets/story/vintage-couple-vignette.jpg";
+import missionRoom from "@/assets/story/mission-control.jpg";
 import "./PageTwo.css";
 
 const DARK_LINES = [
@@ -70,6 +72,7 @@ export function PageTwo({
   const [letterCompleted, setLetterCompleted] = useState(false);
   const [passage, setPassage] = useState(false);
   const [exitAcknowledged, setExitAcknowledged] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const unlocked = passageUnlocked(visited);
 
   useEffect(() => {
@@ -77,6 +80,27 @@ export function PageTwo({
       stopMochiVoice();
     };
   }, []);
+
+  // Preload Page 3 essential visual and sound assets while exploring Page 2
+  useEffect(() => {
+    if (scene === "lit" || unlocked) {
+      try {
+        const img = new Image();
+        img.src = missionRoom;
+        preloadSoundEffects();
+      } catch {
+        // Safe fallback in test or headless environments
+      }
+    }
+  }, [scene, unlocked]);
+
+  // Preload Page 3 component chunk when passage unlocks
+  useEffect(() => {
+    if (unlocked) {
+      import("@/pages/PageThree").catch(() => {});
+    }
+  }, [unlocked]);
+
 
   useEffect(() => {
     if (passage) {
@@ -228,7 +252,9 @@ export function PageTwo({
                 variant="ghost"
                 className="secret-passage"
                 aria-label="Open the secret passage"
+                disabled={isNavigating}
                 onClick={() => {
+                  if (isNavigating) return;
                   playDoorOpen();
                   setExitAcknowledged(true);
                   setPassage(true);
@@ -436,16 +462,21 @@ export function PageTwo({
           <DialogDescription>
             Ooooh... I think our next adventure is hiding behind this one!
           </DialogDescription>
-          <Button asChild className="story-action">
+          <Button asChild className="story-action" disabled={isNavigating}>
             <Link
               to={nextPageRoute}
-              onClick={() => {
+              onClick={(e) => {
+                if (isNavigating) {
+                  e.preventDefault();
+                  return;
+                }
+                setIsNavigating(true);
                 stopMochiSpeech();
                 playTransition();
               }}
               {...(preview ? { search: () => ({ preview: "true" }) } : {})}
             >
-              Continue the adventure ♡
+              {isNavigating ? "Opening door... ♡" : "Continue the adventure ♡"}
             </Link>
           </Button>
         </DialogContent>

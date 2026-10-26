@@ -23,6 +23,10 @@ export {
   playBackgroundMusic,
   pauseBackgroundMusic,
   stopBackgroundMusic,
+  pauseBgmForVideo,
+  resumeBgmAfterVideo,
+  releaseBgmFromVideo,
+  isVideoBgmActive,
   isBgmPlaying,
   isBgmAutoplayBlocked,
   setBgmVolume,
@@ -61,16 +65,29 @@ function getCtx(): AudioContext | null {
   if (typeof window === "undefined") return null;
   if (!_ctx) {
     try {
-      _ctx = new AudioContext();
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) {
+        _ctx = new AudioCtx();
+      }
     } catch {
       return null;
     }
   }
   // Resume context if suspended (browser autoplay policy)
-  if (_ctx.state === "suspended") {
+  if (_ctx && _ctx.state === "suspended") {
     _ctx.resume().catch(() => {});
   }
   return _ctx;
+}
+
+/**
+ * Returns the application-wide shared AudioContext instance.
+ * Avoids spawning multiple AudioContexts that exhaust browser limits.
+ */
+export function getSharedAudioContext(): AudioContext | null {
+  return getCtx();
 }
 
 // ─── Guard — only play when sound pref is on ─────────────────────────────
@@ -88,7 +105,27 @@ export function _resetAudioCooldowns(): void {
   stopPeelSound();
 }
 
-/** Plays an audio asset file with fallback support and duplicate click protection */
+/** Preload essential story sound effects into memory for instant responsiveness */
+export function preloadSoundEffects(): void {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioCtor = window.Audio || Audio;
+    if (!AudioCtor) return;
+    [
+      SOUND_URLS.transmission,
+      SOUND_URLS.continue,
+      SOUND_URLS.switch,
+      SOUND_URLS.door,
+    ].forEach((url) => {
+      const audio = new AudioCtor(url);
+      audio.preload = "auto";
+    });
+  } catch {
+    // Ignore preload failures in unsupported environments
+  }
+}
+
+/** Plays an audio asset file with fallback support, promise safety, and duplicate protection */
 function playAudioFile(url: string, volume = 0.85, fallback?: () => void) {
   if (typeof window === "undefined" || !canPlay()) return;
 
@@ -112,9 +149,22 @@ function playAudioFile(url: string, volume = 0.85, fallback?: () => void) {
     }
     const audio = new AudioCtor(url);
     audio.volume = Math.max(0, Math.min(1, volume));
+
+    const cleanup = () => {
+      audio.onended = null;
+      audio.onerror = null;
+    };
+    audio.onended = cleanup;
+    audio.onerror = () => {
+      cleanup();
+      fallback?.();
+    };
+
     const playPromise = audio.play();
     if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {
+      playPromise.catch((err) => {
+        cleanup();
+        // Fallback gracefully on browser autoplay rejections or interruption
         fallback?.();
       });
     }

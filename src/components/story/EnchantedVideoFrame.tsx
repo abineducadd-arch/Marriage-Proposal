@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { pauseBgmForVideo, resumeBgmAfterVideo, releaseBgmFromVideo } from "@/lib/bgm";
 import "./EnchantedVideoFrame.css";
 
 interface EnchantedVideoFrameProps {
   videoSrc: string | null;
   senderName?: string;
+  onClose?: () => void;
 }
 
 function EngravedCornerDetail({ className }: { className: string }) {
@@ -71,7 +73,43 @@ function EnchantedSvgDefs() {
   );
 }
 
-export function EnchantedVideoFrame({ videoSrc, senderName }: EnchantedVideoFrameProps) {
+export function EnchantedVideoFrame({
+  videoSrc,
+  senderName,
+  onClose,
+}: EnchantedVideoFrameProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoSrc) return;
+
+    const handlePlay = () => {
+      pauseBgmForVideo();
+    };
+
+    const handleEnded = () => {
+      resumeBgmAfterVideo();
+    };
+
+    const handleError = () => {
+      resumeBgmAfterVideo();
+    };
+
+    video.addEventListener("play", handlePlay);
+    video.addEventListener("playing", handlePlay);
+    video.addEventListener("ended", handleEnded);
+    video.addEventListener("error", handleError);
+
+    return () => {
+      video.removeEventListener("play", handlePlay);
+      video.removeEventListener("playing", handlePlay);
+      video.removeEventListener("ended", handleEnded);
+      video.removeEventListener("error", handleError);
+      releaseBgmFromVideo();
+    };
+  }, [videoSrc]);
+
   return (
     <div className="enchanted-video-presentation" data-testid="enchanted-video-frame">
       {/* Shared SVG Gradients */}
@@ -126,6 +164,7 @@ export function EnchantedVideoFrame({ videoSrc, senderName }: EnchantedVideoFram
             <div className="enchanted-screen-container">
               {videoSrc ? (
                 <video
+                  ref={videoRef}
                   controls
                   playsInline
                   preload="metadata"

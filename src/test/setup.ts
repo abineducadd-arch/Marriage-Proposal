@@ -21,9 +21,25 @@ Object.defineProperty(window, "matchMedia", {
 
 // Mock HTMLMediaElement play/pause in jsdom environment to prevent console noise
 if (typeof window !== "undefined" && window.HTMLMediaElement) {
-  window.HTMLMediaElement.prototype.play = () => Promise.resolve();
-  window.HTMLMediaElement.prototype.pause = () => {};
+  Object.defineProperty(window.HTMLMediaElement.prototype, "paused", {
+    configurable: true,
+    writable: true,
+    value: true,
+  });
+  window.HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
+    this.paused = false;
+    return Promise.resolve();
+  };
+  window.HTMLMediaElement.prototype.pause = function (this: HTMLMediaElement) {
+    this.paused = true;
+  };
 }
+
+// Mock HTMLCanvasElement getContext for tests
+if (typeof window !== "undefined" && window.HTMLCanvasElement) {
+  window.HTMLCanvasElement.prototype.getContext = () => null;
+}
+
 
 // Polyfill PointerEvent in jsdom environment for pointer down/move/up/cancel testing
 if (typeof window !== "undefined" && !window.PointerEvent) {

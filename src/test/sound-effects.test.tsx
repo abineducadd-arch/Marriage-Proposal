@@ -9,10 +9,33 @@ import { SoundToggle } from "@/components/SoundToggle";
 import { BackgroundMusic } from "@/components/BackgroundMusic";
 import { FoldedCorner } from "@/components/FoldedCorner";
 
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
+  return {
+    ...actual,
+    Link: ({ to, children, onClick, className, ...rest }: any) => (
+      <a
+        href={typeof to === "string" ? to : "#"}
+        onClick={onClick}
+        className={className}
+        {...rest}
+      >
+        {children}
+      </a>
+    ),
+  };
+});
+
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(null);
-  window.HTMLMediaElement.prototype.play = vi.fn().mockResolvedValue(undefined);
-  window.HTMLMediaElement.prototype.pause = vi.fn();
+  window.HTMLMediaElement.prototype.play = vi.fn().mockImplementation(function (this: HTMLMediaElement) {
+    this.paused = false;
+    return Promise.resolve();
+  });
+  window.HTMLMediaElement.prototype.pause = vi.fn().mockImplementation(function (this: HTMLMediaElement) {
+    this.paused = true;
+  });
+
   window.matchMedia = vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
@@ -213,6 +236,18 @@ describe("Romantic Proposal Website Sound Effects Mapping & Verification", () =>
         fireEvent.click(openMsgBtn);
       });
       expect(playTransmissionSpy).toHaveBeenCalledTimes(8);
+    });
+
+    it("plays transmission sound on Skip intro button", () => {
+      const playTransmissionSpy = vi.spyOn(sounds, "playTransmission");
+      render(<PageThree />);
+
+      const skipBtn = screen.getByRole("button", { name: /skip intro/i });
+      act(() => {
+        fireEvent.click(skipBtn);
+      });
+
+      expect(playTransmissionSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -583,5 +618,95 @@ describe("Romantic Proposal Website Sound Effects Mapping & Verification", () =>
         (globalThis as unknown as GlobalAudioTarget).Audio = originalGlobalAudio;
       }
     });
+
+    it("does not restart background music or reset its currentTime when navigating between pages and re-rendering Page 3", async () => {
+      // Start BGM on Page 1 / Page 2
+      await bgm.playBackgroundMusic();
+      const bgmAudio = bgm.getBgmAudio();
+      if (bgmAudio) {
+        bgmAudio.currentTime = 55;
+      }
+
+      const playSpy = vi.spyOn(bgm, "playBackgroundMusic");
+
+      // Render Page 3
+      const { rerender } = render(<PageThree />);
+
+      // Re-renders should not restart BGM from scratch
+      rerender(<PageThree />);
+
+      expect(bgmAudio?.currentTime).toBe(55);
+      expect(bgm.isBgmPlaying()).toBe(true);
+    });
+
+    it("prevents multiple rapid door clicks from triggering duplicate transition effects", () => {
+      const playTransitionSpy = vi.spyOn(sounds, "playTransition");
+      render(<PageTwo />);
+
+      // Knock and open door
+      act(() => {
+        fireEvent.click(screen.getByRole("button", { name: /what's behind it\?/i }));
+      });
+      act(() => {
+        fireEvent.click(screen.getByRole("button", { name: /open the mysterious door/i }));
+      });
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      // Turn on switch
+      const switchBtn = screen.getByRole("button", { name: /turn on the light switch/i });
+      act(() => {
+        fireEvent.focus(switchBtn);
+        fireEvent.click(switchBtn, { detail: 0 });
+      });
+
+      // Advance Mochi light lines
+      for (let i = 0; i < 3; i++) {
+        const cBtn = screen.queryByRole("button", { name: /continue|let's explore/i });
+        if (cBtn) {
+          act(() => {
+            fireEvent.click(cBtn);
+          });
+        }
+      }
+
+      // Explore 3 objects
+      ["chocolate", "gift", "picture"].forEach((kind) => {
+        const btn = screen.getByRole("button", {
+          name: new RegExp(`explore ${kind === "chocolate" ? "chocolate box" : kind === "gift" ? "wrapped gift" : "framed picture"}`, "i"),
+        });
+        act(() => {
+          fireEvent.click(btn);
+        });
+        const closeBtn = screen.getAllByRole("button", { name: /close/i })[0];
+        act(() => {
+          fireEvent.click(closeBtn);
+        });
+      });
+
+      // Open passage dialog
+      const passageBtn = screen.getByRole("button", { name: /open the secret passage/i });
+      act(() => {
+        fireEvent.click(passageBtn);
+      });
+
+      // Link in passage dialog
+      const continueAdvLink = screen.getByRole("link", { name: /continue the adventure/i });
+
+      // First click
+      act(() => {
+        fireEvent.click(continueAdvLink);
+      });
+      expect(playTransitionSpy).toHaveBeenCalledTimes(1);
+
+      // Rapid second and third clicks are ignored by isNavigating guard
+      act(() => {
+        fireEvent.click(continueAdvLink);
+        fireEvent.click(continueAdvLink);
+      });
+      expect(playTransitionSpy).toHaveBeenCalledTimes(1);
+    });
   });
 });
+

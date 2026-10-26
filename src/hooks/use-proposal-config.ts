@@ -18,6 +18,7 @@ import { fetchProposalDataFromSupabase } from "@/lib/supabase-service";
 
 export interface UseProposalConfigOptions {
   preview?: boolean;
+  loadVideo?: boolean;
 }
 
 export function useProposalConfig(options?: UseProposalConfigOptions) {
@@ -89,11 +90,17 @@ export function useProposalConfig(options?: UseProposalConfigOptions) {
     };
   }, [preview]);
 
-  // Load video blob from IndexedDB or use external URL
+  // Load video blob from IndexedDB or use external URL (deferred if loadVideo is false)
+  const shouldLoadVideo = options?.loadVideo ?? true;
+
   useEffect(() => {
     let cancelled = false;
 
     async function loadVideo() {
+      if (!shouldLoadVideo) {
+        return;
+      }
+
       // If an external URL is set, use it directly
       if (config.video?.externalUrl) {
         setVideoSrc(config.video.externalUrl);
@@ -132,7 +139,8 @@ export function useProposalConfig(options?: UseProposalConfigOptions) {
     return () => {
       cancelled = true;
     };
-  }, [config.video?.hasVideo, config.video?.externalUrl, config.video?.updatedAt, preview]);
+  }, [shouldLoadVideo, config.video?.hasVideo, config.video?.externalUrl, config.video?.updatedAt, preview]);
+
 
   return {
     config,
