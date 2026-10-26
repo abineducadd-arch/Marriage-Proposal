@@ -1,0 +1,209 @@
+/* Vintage Scroll-To-Reveal Letter Styles */
+
+.scroll-reveal-letter-card {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: rgba(255, 253, 248, 0.6) !important;
+  border: 1px solid rgba(142, 98, 54, 0.28) !important;
+  border-left: 3px solid #8e6236 !important;
+  border-radius: 8px !important;
+  box-shadow:
+    inset 0 1px 4px rgba(110, 70, 30, 0.08),
+    0 2px 10px rgba(60, 35, 15, 0.05) !important;
+  user-select: text;
+}
+
+/* Dedicated scrollable viewport */
+.scroll-reveal-viewport {
+  position: relative;
+  width: 100%;
+  height: clamp(150px, 26vh, 195px);
+  max-height: 220px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  outline: none;
+
+  /* Refined antique scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(142, 98, 54, 0.42) rgba(142, 98, 54, 0.08);
+}
+
+.scroll-reveal-viewport:focus-visible {
+  box-shadow: inset 0 0 0 1.5px rgba(142, 98, 54, 0.45);
+}
+
+/* Webkit scrollbar for Chrome, Safari, Edge */
+.scroll-reveal-viewport::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-reveal-viewport::-webkit-scrollbar-track {
+  background: rgba(142, 98, 54, 0.06);
+  border-radius: 4px;
+}
+
+.scroll-reveal-viewport::-webkit-scrollbar-thumb {
+  background: rgba(142, 98, 54, 0.38);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.scroll-reveal-viewport::-webkit-scrollbar-thumb:hover {
+  background: rgba(118, 77, 36, 0.68);
+}
+
+/* Scroll track provides standard, comfortable scroll distance */
+.scroll-reveal-track {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Content container holding the romantic message text */
+.scroll-reveal-content {
+  position: relative;
+  width: 100%;
+  font-family: var(--font-display, "Cormorant Garamond", "Baskerville", Georgia, serif);
+  font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+  line-height: 1.85;
+  font-style: italic;
+  font-weight: 500;
+  color: #2e1a0b;
+  letter-spacing: 0.015em;
+  text-align: left;
+  box-sizing: border-box;
+  will-change: transform;
+}
+
+/* Word tokens */
+.letter-word {
+  display: inline-block;
+  white-space: pre-wrap;
+  transition:
+    opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.38s ease;
+}
+
+/* Initially hidden words: completely invisible and elevated */
+.letter-word.letter-word-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  filter: blur(2px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Revealed words: smoothly fade in and settle into place */
+.letter-word.letter-word-revealed {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Line and paragraph breaks */
+.letter-br {
+  display: block;
+  content: "";
+  margin-top: 0.45em;
+}
+
+/* Delicate completion badge */
+.letter-completion-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(142, 98, 54, 0.28);
+  color: #8f6539;
+  user-select: none;
+  animation: letter-badge-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+}
+
+.completion-flourish {
+  font-size: 0.85rem;
+  color: #9c6c39;
+  opacity: 0.7;
+}
+
+.completion-heart {
+  font-size: 1.15rem;
+  color: #be3b45;
+  display: inline-block;
+  animation: completion-heart-pulse 2s infinite ease-in-out;
+}
+
+.completion-sparkle {
+  font-size: 1rem;
+  color: #d49a37;
+  display: inline-block;
+  animation: completion-sparkle-twinkle 1.8s infinite ease-in-out;
+}
+
+@keyframes letter-badge-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes completion-heart-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.22);
+    filter: drop-shadow(0 0 4px rgba(190, 59, 69, 0.4));
+  }
+}
+
+@keyframes completion-sparkle-twinkle {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.2) rotate(15deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(212, 154, 55, 0.5));
+  }
+}
+
+/* Accessibility: respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .letter-word {
+    transition: opacity 0.1s ease !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .letter-word.letter-word-hidden {
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .letter-completion-badge,
+  .completion-heart,
+  .completion-sparkle {
+    animation: none !important;
+  }
+}

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Mochi, type MochiExpression } from "@/components/Mochi";
 import { DialogueBubble } from "@/components/DialogueBubble";
 import { FoldedCorner } from "@/components/FoldedCorner";
@@ -8,6 +8,7 @@ import { getWelcomeDialogue } from "@/lib/proposal-config";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { SoundToggle } from "@/components/SoundToggle";
 import { playContinue, playTransition, handleBgmUserInteraction } from "@/lib/sounds";
+import { speakMochiDialogue, stopMochiSpeech } from "@/lib/mochi-voice";
 
 export const DIALOGUE: { text: string; expression: MochiExpression }[] = [
   { text: "Hiii, you! ♡", expression: "happy" },
@@ -36,14 +37,22 @@ export function WelcomePage({ onNext }: { onNext?: () => void }) {
   const isLast = index === dialogueList.length - 1;
   const line = dialogueList[index] || DIALOGUE[index]!;
 
+  useEffect(() => {
+    if (!introComplete && line?.text && textVisible) {
+      speakMochiDialogue(line.text);
+    }
+  }, [index, line?.text, introComplete, textVisible]);
+
   const advance = () => {
     handleBgmUserInteraction();
     if (busy.current) return;
     if (isLast) {
+      stopMochiSpeech();
       playTransition();
       setIntroComplete(true);
       return;
     }
+    stopMochiSpeech();
     playContinue();
     busy.current = true;
     setTextVisible(false);
@@ -58,7 +67,7 @@ export function WelcomePage({ onNext }: { onNext?: () => void }) {
   const introSubtitle = config.personalDetails.introMessage?.trim();
 
   return (
-    <main className="paper-bg relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-5 py-10">
+    <main className="page-welcome paper-bg relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-5 py-6 sm:py-10">
       <PreviewBanner preview={preview} />
       <FloatingDecorations />
 
@@ -88,6 +97,7 @@ export function WelcomePage({ onNext }: { onNext?: () => void }) {
       <FoldedCorner
         active={introComplete}
         onPeelComplete={() => {
+          stopMochiSpeech();
           setShowTransition(true);
           onNext?.();
         }}

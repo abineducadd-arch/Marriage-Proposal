@@ -21,6 +21,7 @@ import {
   playTransition,
   playTransmission,
 } from "@/lib/sounds";
+import { stopMochiSpeech } from "@/lib/mochi-voice";
 import missionRoom from "@/assets/story/mission-control.jpg";
 import "./PageThree.css";
 
@@ -58,6 +59,12 @@ export function PageThree() {
   const [celebrationLine, setCelebrationLine] = useState(0);
   const [tabletLine, setTabletLine] = useState(0);
   const celebrationStarted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      stopMochiSpeech();
+    };
+  }, []);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -106,6 +113,7 @@ export function PageThree() {
       setTabletLine((line) => line + 1);
       return;
     }
+    stopMochiSpeech();
     setScene("video");
   };
 

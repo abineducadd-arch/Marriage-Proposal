@@ -6,6 +6,14 @@ import { MochiGuide } from "@/components/story/MochiGuide";
 import { DarkRoom } from "@/components/story/DarkRoom";
 import { ObjectArtwork } from "@/components/story/ObjectArtwork";
 import { MagicalPopupSparkles } from "@/components/story/MagicalPopupSparkles";
+import { ScrollRevealLetter } from "@/components/story/ScrollRevealLetter";
+import {
+  speakMochiGuidance,
+  stopMochiVoice,
+  speakMochiDialogue,
+  stopMochiSpeech,
+  MOCHI_LETTER_GUIDANCE,
+} from "@/lib/mochi-voice";
 import {
   OBJECTS,
   SWITCH_POSITION,
@@ -59,9 +67,22 @@ export function PageTwo({
   const [visited, setVisited] = useState<ObjectId[]>([]);
   const [activeObject, setActiveObject] = useState<ObjectId | null>(null);
   const [objectOpen, setObjectOpen] = useState(false);
+  const [letterCompleted, setLetterCompleted] = useState(false);
   const [passage, setPassage] = useState(false);
   const [exitAcknowledged, setExitAcknowledged] = useState(false);
   const unlocked = passageUnlocked(visited);
+
+  useEffect(() => {
+    return () => {
+      stopMochiVoice();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (passage) {
+      speakMochiDialogue("Ooooh... I think our next adventure is hiding behind this one!");
+    }
+  }, [passage]);
   useEffect(() => {
     if (scene !== "opening" && scene !== "dark") return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -77,7 +98,9 @@ export function PageTwo({
   const openObject = (id: ObjectId) => {
     playSparkle();
     setActiveObject(id);
+    setLetterCompleted(false);
     setObjectOpen(true);
+    speakMochiGuidance(MOCHI_LETTER_GUIDANCE);
     const next = exploreObject(visited, id);
     setVisited(next);
     // Fire unlock sound exactly once when all three are found
@@ -267,6 +290,9 @@ export function PageTwo({
         open={objectOpen}
         onOpenChange={(open) => {
           setObjectOpen(open);
+          if (!open) {
+            stopMochiVoice();
+          }
         }}
       >
         {currentObject && activeObject && (
@@ -362,21 +388,39 @@ export function PageTwo({
                 <ObjectArtwork kind={activeObject} />
               </div>
 
-              <blockquote className="handwritten-note parchment-message-text">
-                {currentObject.clue}
-              </blockquote>
+              <ScrollRevealLetter
+                key={activeObject}
+                text={currentObject.clue}
+                objectId={activeObject}
+                onComplete={() => {
+                  setLetterCompleted(true);
+                  playSparkle();
+                  if (currentObject?.dialogue) {
+                    speakMochiDialogue(currentObject.dialogue);
+                  }
+                }}
+              />
 
               <DialogDescription className="clue-dialogue parchment-dialogue">
                 <span className="dialogue-icon" aria-hidden="true">
                   ✦
                 </span>
-                <span>{currentObject.dialogue}</span>
+                <span className="parchment-dialogue-content">
+                  {letterCompleted ? (
+                    <span className="mochi-completed-dialogue">{currentObject.dialogue}</span>
+                  ) : (
+                    <span className="mochi-guidance-instruction">{MOCHI_LETTER_GUIDANCE}</span>
+                  )}
+                </span>
               </DialogDescription>
 
               <div className="parchment-footer">
                 <Button
                   className="story-action parchment-close-btn"
-                  onClick={() => setObjectOpen(false)}
+                  onClick={() => {
+                    stopMochiVoice();
+                    setObjectOpen(false);
+                  }}
                 >
                   Close
                 </Button>
@@ -395,7 +439,10 @@ export function PageTwo({
           <Button asChild className="story-action">
             <Link
               to={nextPageRoute}
-              onClick={() => playTransition()}
+              onClick={() => {
+                stopMochiSpeech();
+                playTransition();
+              }}
               {...(preview ? { search: () => ({ preview: "true" }) } : {})}
             >
               Continue the adventure ♡

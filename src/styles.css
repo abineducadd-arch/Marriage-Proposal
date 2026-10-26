@@ -335,12 +335,24 @@ body {
   animation: glow-in 1.2s ease-out both;
 }
 
-/* ─── Sound Toggle ──────────────────────────────────────────────────────── */
-.sound-toggle {
+/* ─── Sound Toggle & Audio Controls ────────────────────────────────────────── */
+.sound-controls-container {
   position: fixed;
   top: 0.9rem;
   right: 1rem;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+/* On Page 1 (WelcomePage), position audio controls to the top-left so the top-right corner fold is completely unobstructed on initial load */
+.page-welcome .sound-controls-container {
+  right: auto;
+  left: max(0.85rem, env(safe-area-inset-left, 0.85rem));
+  top: max(0.85rem, env(safe-area-inset-top, 0.85rem));
+}
+.sound-toggle {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
